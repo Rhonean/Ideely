@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/w_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:background="@drawable/widget_bg">
+
+    <TextView
+        android:id="@+id/w_book"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textAllCaps="true"
+        android:letterSpacing="0.08"
+        android:textSize="11sp"
+        android:textColor="#CCF7F5EF"
+        android:text="Idee van de dag" />
+
+    <TextView
+        android:id="@+id/w_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="#F7F5EF"
+        android:text="Je idee van vandaag" />
+
+    <TextView
+        android:id="@+id/w_body"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:textSize="13sp"
+        android:lineSpacingMultiplier="1.15"
+        android:textColor="#E6F7F5EF"
+        android:text="Open Ideeënstash om je eerste stash te lezen." />
+
+    <TextView
+        android:id="@+id/w_meta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:maxLines="1"
+        android:textSize="11sp"
+        android:textColor="#B3F7F5EF"
+        android:text="" />
+</LinearLayout>

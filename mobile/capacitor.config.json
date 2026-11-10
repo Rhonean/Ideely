@@ -1,0 +1,15 @@
+{
+  "appId": "nl.procontrolworks.ideeenstash",
+  "appName": "Ideeënstash",
+  "webDir": "www",
+  "backgroundColor": "#eef0ec",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "auto"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#1e4d47"
+    }
+  }
+}

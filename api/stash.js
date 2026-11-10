@@ -1,12 +1,13 @@
 // Ideeënstash — gedeelde stash voor een boek uit de catalogus.
 // Bestaat hij al in de opslag, dan komt hij direct terug (JSON). Anders wordt hij
 // één keer geschreven (gestreamd als JSON Lines) en daarna voor iedereen bewaard.
-import { limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
+import { cors, limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
 import { LIST } from "./_lib/books.js";
 import { stashPrompt, parseStash } from "./_lib/prompts.js";
 export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
+  if (cors(req, res)) return;
   const id = String(req.query?.id || "");
   const book = LIST[id];
   if (!book) return res.status(404).json({ error: "not_found" });

@@ -1,10 +1,11 @@
 // Ideeënstash — gedeelde verdieping per idee van een catalogusboek.
-import { limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
+import { cors, limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
 import { LIST, HANDWRITTEN } from "./_lib/books.js";
 import { deepPrompt } from "./_lib/prompts.js";
 export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
+  if (cors(req, res)) return;
   const id = String(req.query?.id || ""), i = parseInt(req.query?.i, 10);
   if (!(i >= 0 && i < 20)) return res.status(400).json({ error: "invalid_request" });
   const key = `${id}_${i}`;

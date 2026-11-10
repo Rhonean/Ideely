@@ -15,11 +15,30 @@ export function limited(req) {
   return false;
 }
 
+// Herkomst van de app op de telefoon (Capacitor): Android "https://localhost", iOS "capacitor://localhost".
+export const APP_ORIGINS = ["https://localhost", "capacitor://localhost", "http://localhost", "ionic://localhost"];
+
 export function sameOrigin(req) {
   const host = req.headers["x-forwarded-host"] || req.headers.host || "";
-  const src = req.headers.origin || req.headers.referer || "";
+  const origin = req.headers.origin || "";
+  if (APP_ORIGINS.includes(origin)) return true;
+  const src = origin || req.headers.referer || "";
   if (!src) return false;
   try { return new URL(src).host === host; } catch { return false; }
+}
+
+// CORS voor de app. Geeft true terug als het verzoek al is afgehandeld (preflight).
+export function cors(req, res) {
+  const o = req.headers.origin || "";
+  if (APP_ORIGINS.includes(o)) {
+    res.setHeader("Access-Control-Allow-Origin", o);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "content-type, x-app-code, x-app-user");
+    res.setHeader("Access-Control-Max-Age", "86400");
+  }
+  if (req.method === "OPTIONS") { res.status(204).end(); return true; }
+  return false;
 }
 
 export function model(tier) {

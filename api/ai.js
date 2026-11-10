@@ -1,9 +1,10 @@
 // Ideeënstash — algemene AI-functie (voorstellen, eigen boeken, geplakte artikelen).
-import { limited, sameOrigin, anthropicStream, pump, startText } from "./_lib/common.js";
+import { cors, limited, sameOrigin, anthropicStream, pump, startText } from "./_lib/common.js";
 export const config = { maxDuration: 120 };
 const MAX_PROMPT = 80000;
 
 export default async function handler(req, res) {
+  if (cors(req, res)) return;
   if (req.method !== "POST") { res.setHeader("Allow", "POST"); return res.status(405).json({ error: "method_not_allowed" }); }
   if (!sameOrigin(req)) return res.status(403).json({ error: "forbidden" });
   const appCode = process.env.APP_CODE || "";
