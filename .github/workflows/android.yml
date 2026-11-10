@@ -7,6 +7,9 @@ on:
     paths: ["index.html", "icon.svg", "mobile/**", ".github/workflows/android.yml"]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,8 +34,12 @@ jobs:
         run: npm run build:www && npx cap sync android
 
       - name: Testversie bouwen
+        id: gradle
         working-directory: mobile/android
-        run: ./gradlew assembleDebug --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew assembleDebug --no-daemon 2>&1 | tee ../../build.log
 
       - name: Testversie beschikbaar maken
         uses: actions/upload-artifact@v4
@@ -40,3 +47,17 @@ jobs:
           name: ideeenstash-android-test
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+
+      - name: Bouwverslag terugschrijven (tak build-log)
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p /tmp/bl && cd /tmp/bl
+          git init -q && git checkout -q -b build-log
+          echo "commit: ${GITHUB_SHA}" > status.txt
+          echo "result: ${{ job.status }}" >> status.txt
+          echo "run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> status.txt
+          if [ -f "$GITHUB_WORKSPACE/build.log" ]; then tail -n 300 "$GITHUB_WORKSPACE/build.log" > build-tail.log; grep -n -i -E "error|failed|what went wrong" "$GITHUB_WORKSPACE/build.log" | head -n 80 > errors.txt || true; fi
+          ls -la "$GITHUB_WORKSPACE/mobile/android/app/build/outputs/apk/debug/" > apk.txt 2>&1 || true
+          git add -A && git -c user.name=ci -c user.email=ci@localhost commit -q -m "Bouwverslag ${GITHUB_SHA}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" build-log
