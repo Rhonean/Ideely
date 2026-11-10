@@ -169,6 +169,10 @@ textarea{min-height:130px;resize:vertical}
 .slide .deep{border-top:1px solid rgba(255,255,255,.25);margin-top:16px;padding-top:12px}
 .slide .deep .dk{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;opacity:.8;margin-bottom:8px}
 .slide .deep p{font-size:1.02rem}
+.slide .buy{margin:6px 0 14px}
+.slide .buybtn{display:block;text-align:center;background:var(--card-ink);color:var(--tc);text-decoration:none;font-weight:700;border-radius:99px;padding:12px 16px;font-size:.95rem}
+.slide .buy small{display:block;opacity:.7;font-size:.74rem;margin-top:6px;text-align:center}
+.slide .buylink{color:var(--card-ink);opacity:.85;font-size:.86rem;margin-top:12px;text-underline-offset:3px}
 .slide .deep small{display:block;opacity:.7;font-size:.78rem;margin-top:4px}
 .sv .ap{margin-top:8px;font-size:.86rem;color:var(--muted)}
 .sv .ap b{color:var(--ink);font-weight:600}
@@ -755,11 +759,20 @@ function coverInner(b){return `<div class="kicker">${esc(tn(b.topic))} · ${b.li
   <p class="meta">${b.titleNl?esc(b.title)+"<br>":""}${esc(b.author||"")}${b.year?" · "+esc(b.year):""}${b.source?" · "+esc(b.source):""}</p>
   ${b.summary?`<p>${esc(b.summary)}</p>`:""}
   <div class="hint">${T("Swipe naar links om te beginnen →","Swipe left to start →","Nach links wischen, um zu beginnen →")}</div>
+  ${canBuy(b)&&b.ideas.length?`<a class="buylink" href="${buyUrl(b)}" target="_blank" rel="noopener sponsored">${T("Hele boek kopen bij ","Buy the full book at ","Ganzes Buch kaufen bei ")}${STORE} ↗</a>`:""}
   ${!b.catalog&&!b.lazy&&!b.live?`<div class="acts"><button id="rdel">${T("Verwijder uit bibliotheek","Remove from library","Aus Bibliothek entfernen")}</button></div>`:""}`}
 function endInner(b){return b.live?`<div class="kicker">${T("Even geduld","One moment","Einen Moment")}</div><h2><span class="spin"></span>${T("Volgende ideeën worden geschreven…","More ideas are being written…","Weitere Ideen werden geschrieben…")}</h2><p>${T("Swipe zo terug om verder te lezen.","Swipe back in a moment to keep reading.","Wische gleich zurück, um weiterzulesen.")}</p>`
   :`<div class="kicker">${T("Klaar","Done","Fertig")}</div><h1>${T("Uitgelezen","Finished","Ausgelesen")}</h1><p>${esc(T(`Je hebt alle ${b.ideas.length} ideeën van ${b.titleNl||b.title} gelezen.`,`You've read all ${b.ideas.length} ideas from ${b.titleNl||b.title}.`,`Du hast alle ${b.ideas.length} Ideen aus ${b.titleNl||b.title} gelesen.`))}</p>
+  ${buyBlock(b)}
   ${endNext(b)}
   <div class="acts"><button id="rdone">${T("Terug","Back","Zurück")}</button><button id="rre">${T("Opnieuw lezen","Read again","Erneut lesen")}</button></div>`}
+/* Koopknop: via ons tussenadres (telt de klik, voegt de partnercode toe) naar bol.com of Amazon */
+const STORE=T("bol.com","Amazon","Amazon");
+function buyUrl(b){const q=`${LANG==="nl"&&b.titleNl?b.titleNl:b.title} ${b.author||""}`.trim();
+  return `${SITE}/api/go?id=${encodeURIComponent(b.id)}&lang=${LANG}&t=${encodeURIComponent(q)}`}
+const canBuy=b=>!b.live&&!b.unknown&&b.kind!=="tekst"&&!!b.title;
+const AFF_NOTE=T("Partnerlink: Ideely krijgt een kleine vergoeding als je het boek koopt. Jij betaalt niets extra.","Affiliate link: Ideely earns a small fee if you buy the book. It costs you nothing extra.","Partnerlink: Ideely erhält eine kleine Vergütung, wenn du das Buch kaufst. Für dich kostet es nichts extra.");
+function buyBlock(b){return canBuy(b)?`<div class="buy"><a class="buybtn" href="${buyUrl(b)}" target="_blank" rel="noopener sponsored">${T("Lees het hele boek","Read the full book","Das ganze Buch lesen")} · ${STORE}</a><small>${AFF_NOTE}</small></div>`:""}
 /* Na het uitlezen: een volgend boek uit hetzelfde onderwerp */
 function endNext(b){if(b.kind)return "";const read=new Set(S.prof.read||[]);
   const nx=ALL.filter(x=>x.topic===b.topic&&x.id!==b.id&&!read.has(x.id)&&prog(x)===0&&!x.unknown).sort((a,c)=>dayRnd(a.id)-dayRnd(c.id))[0];
