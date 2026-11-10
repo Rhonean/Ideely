@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ideely</title>
-<meta name="theme-color" content="#1e4d47">
+<meta name="theme-color" content="#f7f6f2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Ideely">
@@ -22,15 +22,15 @@ body{margin:0}
 img{max-width:100%}
 /* Layout: één-scherm telefoonapp — kop, inhoud, onderbalk; profiel en lezen openen als volledig scherm */
 :root{
-  --bg:#eef0ec; --surface:#fbfcfa; --ink:#15211e; --muted:#5d6b67; --line:#d6dcd7;
-  --accent:#c2410c; --accent-ink:#fff7ef; --soft:#f6e3d6;
+  --bg:#f7f6f2; --surface:#ffffff; --ink:#15211e; --muted:#5f6b67; --line:#e3e3dc;
+  --accent:#c2410c; --accent-ink:#fff7ef; --soft:#fbe9dc;
   --t1:#1e4d47; --t2:#5b3a6e; --t3:#7a4a1c; --t4:#24466e; --t5:#6e2f3c; --t6:#3d5a24;
   --card-ink:#f7f5ef;
   --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --f-read:"Literata",Georgia,"Times New Roman",serif;
   --f-ui:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root[data-theme="system"]{
   --bg:#0f1716; --surface:#172220; --ink:#e9eeeb; --muted:#93a39e; --line:#26332f;
   --accent:#f08a4b; --accent-ink:#1a0d04; --soft:#3a2416;
   --t1:#235a53; --t2:#5e3f73; --t3:#80511f; --t4:#2a4f7c; --t5:#773645; --t6:#45652a;
@@ -193,6 +193,38 @@ textarea{min-height:130px;resize:vertical}
 .codebox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
 .cb-in{background:var(--surface);color:var(--ink);border-radius:16px;padding:18px;width:100%;max-width:420px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px}
 .cb-in h2{margin:0}
+/* welkom, instellingen, widgettip */
+.seg3{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg3 button{border:0;background:none;padding:8px 4px;border-radius:9px;font-size:.86rem;color:var(--muted)}
+.seg3 button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.langsel{max-width:360px;margin:4px auto 0}
+.dots{flex:1;display:flex;gap:6px;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:4px;background:var(--line);transition:width .2s}
+.dots i.on{background:var(--accent);width:22px}
+.intro .ob-top{min-height:34px}
+.hero{text-align:center;margin:22px 0 20px}
+.brand.big{font-size:2.3rem}
+.hero h1{margin-top:12px}
+.hero .lede{max-width:420px;margin:0 auto}
+.demo{background:var(--tc);color:var(--card-ink);border-radius:20px;padding:18px 18px 16px;box-shadow:0 14px 30px -14px rgba(30,77,71,.5);transform:rotate(-1.2deg);margin:6px 8px 10px}
+.demo .kicker{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;opacity:.8}
+.demo h3{font-family:var(--f-display);font-size:1.3rem;line-height:1.15;margin:8px 0}
+.demo p{font-family:var(--f-read);font-size:.97rem;line-height:1.55;margin:0 0 10px}
+.demo .apply{background:rgba(255,255,255,.14);border-radius:12px;padding:10px 12px}
+.demo .apply b{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;opacity:.8;margin-bottom:3px}
+.demo .apply span{font-size:.92rem}
+.feat{list-style:none;padding:0;margin:18px 0 0;display:flex;flex-direction:column;gap:10px}
+.feat li{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--soft);color:var(--accent)}
+.feat b{display:block;font-family:var(--f-display);font-size:1.02rem;margin-bottom:2px}
+.feat span:not(.ic){color:var(--muted);font-size:.9rem}
+.tip{display:grid;grid-template-columns:44px 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+.tip p{margin:3px 0 10px;font-size:.88rem;color:var(--muted)}
+.tip .btn{padding:8px 12px;font-size:.86rem}
+.set{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.setrow{padding:14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.setrow:last-child{border-bottom:0}
+.setrow p,.setrow small{margin:0;color:var(--muted);font-size:.86rem}
 </style>
 </head>
 <body>
@@ -223,32 +255,53 @@ textarea{min-height:130px;resize:vertical}
 const NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
 const SITE="https://ideely.vercel.app";
 const API=NATIVE?SITE:"";
-const CATALOG=JSON.parse(document.getElementById("catalog").textContent).map(b=>({...b,catalog:true,ideas:b.ideas.map(([title,body,apply])=>({title,body,apply}))}));
+/* Taal: nl, en of de. Gekozen bij de start of in Instellingen; anders de taal van het toestel. */
+const LANGS=["nl","en","de"];
+const LANG=(()=>{try{const l=JSON.parse(localStorage.getItem("ideely")||"null");if(l&&l.prof&&LANGS.includes(l.prof.lang))return l.prof.lang}catch{}
+  const n=String(navigator.language||"nl").slice(0,2).toLowerCase();return n==="de"?"de":n==="en"?"en":"nl"})();
+document.documentElement.lang=LANG;
+const T=(nl,en,de)=>LANG==="en"?en:LANG==="de"?de:nl;
+const LOCALE=T("nl-NL","en-GB","de-DE");
+const LANG_IN=T("het Nederlands","het Engels","het Duits");
+const LQ=LANG==="nl"?"":"&lang="+LANG;
+const SK=id=>LANG==="nl"?id:id+"@"+LANG;
+/* Weergave: standaard licht; donker of systeem alleen als je dat kiest */
+(()=>{let th="light";try{th=JSON.parse(localStorage.getItem("ideely")||"null")?.prof?.theme||"light"}catch{}document.documentElement.dataset.theme=th})();
+/* De handgeschreven samenvattingen zijn Nederlands; in een andere taal worden ze net als de rest één keer gemaakt */
+const CATALOG=JSON.parse(document.getElementById("catalog").textContent).map(b=>LANG==="nl"
+  ?{...b,catalog:true,ideas:b.ideas.map(([title,body,apply])=>({title,body,apply}))}
+  :{...b,catalog:true,lazy:true,titleNl:null,summary:"",ideas:[]});
 const TOPICS=["Mindset","Productiviteit","Psychologie","Geld","Gezondheid","Energie","Leiderschap","Relaties","Filosofie","Communicatie","Gewoontes","Ondernemen","Wetenschap","Natuur","Geschiedenis","Politiek","Economie","Technologie"];
 const KNOWLEDGE=["Wetenschap","Natuur","Geschiedenis","Politiek","Economie","Technologie","Filosofie"];
+const TOPIC_T={Mindset:["Mindset","Mindset"],Productiviteit:["Productivity","Produktivität"],Psychologie:["Psychology","Psychologie"],Geld:["Money","Geld"],Gezondheid:["Health","Gesundheit"],Energie:["Energy","Energie"],Leiderschap:["Leadership","Führung"],Relaties:["Relationships","Beziehungen"],Filosofie:["Philosophy","Philosophie"],Communicatie:["Communication","Kommunikation"],Gewoontes:["Habits","Gewohnheiten"],Ondernemen:["Business","Unternehmertum"],Wetenschap:["Science","Wissenschaft"],Natuur:["Nature","Natur"],Geschiedenis:["History","Geschichte"],Politiek:["Politics","Politik"],Economie:["Economics","Wirtschaft"],Technologie:["Technology","Technologie"]};
+const tn=t=>{const x=TOPIC_T[t];return x?T(t,x[0],x[1]):String(t||"")};
 const LISTBOOKS=JSON.parse(document.getElementById("booklist").textContent).map(([id,topic,title,author,year])=>({id,topic,title,author,year,lazy:true,ideas:[]}));
 const ALL=[...CATALOG,...LISTBOOKS];
 function applyShared(b,d){if(!d)return;if(d.known===false){b.unknown=true;return}Object.assign(b,{titleNl:d.titleNl||null,summary:d.summary||"",ideas:d.ideas||[]})}
 const GOALS=[
- {id:"productief",label:"Productiever werken",sub:"Meer gedaan krijgen, minder chaos",topics:["Productiviteit","Gewoontes"]},
- {id:"focus",label:"Rust in mijn hoofd",sub:"Focus en minder stress",topics:["Productiviteit","Filosofie","Energie"]},
- {id:"energie",label:"Meer energie",sub:"Fitter door de dag",topics:["Energie","Gezondheid"]},
- {id:"gezond",label:"Gezonder leven",sub:"Slaap, beweging, voeding",topics:["Gezondheid","Gewoontes"]},
- {id:"mindset",label:"Sterkere mindset",sub:"Veerkracht en zelfvertrouwen",topics:["Mindset","Filosofie"]},
- {id:"leiden",label:"Beter leidinggeven",sub:"Teams en verantwoordelijkheid",topics:["Leiderschap","Communicatie"]},
- {id:"carriere",label:"Groeien in mijn werk",sub:"Invloed en overtuigingskracht",topics:["Communicatie","Psychologie","Leiderschap"]},
- {id:"relaties",label:"Betere relaties",sub:"Partner, vrienden, familie",topics:["Relaties","Communicatie"]},
- {id:"geld",label:"Slimmer met geld",sub:"Sparen, beleggen, vrijheid",topics:["Geld"]},
- {id:"ondernemen",label:"Iets opbouwen",sub:"Een bedrijf of eigen project",topics:["Ondernemen","Leiderschap"]},
- {id:"mensen",label:"Mensen beter begrijpen",sub:"Hoe we denken en kiezen",topics:["Psychologie","Relaties"]},
- {id:"zin",label:"Meer zin en richting",sub:"Waarden en levenskeuzes",topics:["Filosofie","Mindset"]},
- {id:"wereld",label:"De wereld beter begrijpen",sub:"Geschiedenis, politiek, economie",topics:["Geschiedenis","Politiek","Economie"]},
- {id:"politiek",label:"Politiek en samenleving",sub:"Democratie, macht en ideeën",topics:["Politiek","Geschiedenis","Filosofie"]},
- {id:"wetenschap",label:"Nieuwsgierig naar wetenschap",sub:"Hoe het universum en leven werken",topics:["Wetenschap","Natuur"]},
- {id:"natuur",label:"Natuur en dieren",sub:"Ecologie, dieren en klimaat",topics:["Natuur","Wetenschap"]},
- {id:"tech",label:"Technologie en de toekomst",sub:"AI, internet en innovatie",topics:["Technologie","Economie"]},
- {id:"geschiedenis",label:"Geschiedenis",sub:"Van de oudheid tot nu",topics:["Geschiedenis","Politiek"]}];
-const PACES=[{n:3,label:"Licht",sub:"± 3 minuten per dag"},{n:5,label:"Normaal",sub:"± 5 minuten per dag"},{n:8,label:"Serieus",sub:"± 8 minuten per dag"},{n:12,label:"Fanatiek",sub:"± 12 minuten per dag"}];
+ {id:"productief",label:T("Productiever werken","Get more done","Produktiver arbeiten"),sub:T("Meer gedaan krijgen, minder chaos","More done, less chaos","Mehr schaffen, weniger Chaos"),topics:["Productiviteit","Gewoontes"]},
+ {id:"focus",label:T("Rust in mijn hoofd","A calmer mind","Ruhe im Kopf"),sub:T("Focus en minder stress","Focus and less stress","Fokus und weniger Stress"),topics:["Productiviteit","Filosofie","Energie"]},
+ {id:"energie",label:T("Meer energie","More energy","Mehr Energie"),sub:T("Fitter door de dag","Feel fitter every day","Fitter durch den Tag"),topics:["Energie","Gezondheid"]},
+ {id:"gezond",label:T("Gezonder leven","Live healthier","Gesünder leben"),sub:T("Slaap, beweging, voeding","Sleep, exercise, food","Schlaf, Bewegung, Ernährung"),topics:["Gezondheid","Gewoontes"]},
+ {id:"mindset",label:T("Sterkere mindset","A stronger mindset","Stärkeres Mindset"),sub:T("Veerkracht en zelfvertrouwen","Resilience and confidence","Resilienz und Selbstvertrauen"),topics:["Mindset","Filosofie"]},
+ {id:"leiden",label:T("Beter leidinggeven","Lead better","Besser führen"),sub:T("Teams en verantwoordelijkheid","Teams and responsibility","Teams und Verantwortung"),topics:["Leiderschap","Communicatie"]},
+ {id:"carriere",label:T("Groeien in mijn werk","Grow in my career","Im Beruf wachsen"),sub:T("Invloed en overtuigingskracht","Influence and persuasion","Einfluss und Überzeugungskraft"),topics:["Communicatie","Psychologie","Leiderschap"]},
+ {id:"relaties",label:T("Betere relaties","Better relationships","Bessere Beziehungen"),sub:T("Partner, vrienden, familie","Partner, friends, family","Partner, Freunde, Familie"),topics:["Relaties","Communicatie"]},
+ {id:"geld",label:T("Slimmer met geld","Smarter with money","Klüger mit Geld"),sub:T("Sparen, beleggen, vrijheid","Saving, investing, freedom","Sparen, Investieren, Freiheit"),topics:["Geld"]},
+ {id:"ondernemen",label:T("Iets opbouwen","Build something","Etwas aufbauen"),sub:T("Een bedrijf of eigen project","A business or side project","Ein Unternehmen oder eigenes Projekt"),topics:["Ondernemen","Leiderschap"]},
+ {id:"mensen",label:T("Mensen beter begrijpen","Understand people","Menschen besser verstehen"),sub:T("Hoe we denken en kiezen","How we think and decide","Wie wir denken und entscheiden"),topics:["Psychologie","Relaties"]},
+ {id:"zin",label:T("Meer zin en richting","Meaning and direction","Mehr Sinn und Richtung"),sub:T("Waarden en levenskeuzes","Values and life choices","Werte und Lebensentscheidungen"),topics:["Filosofie","Mindset"]},
+ {id:"wereld",label:T("De wereld beter begrijpen","Understand the world","Die Welt besser verstehen"),sub:T("Geschiedenis, politiek, economie","History, politics, economics","Geschichte, Politik, Wirtschaft"),topics:["Geschiedenis","Politiek","Economie"]},
+ {id:"politiek",label:T("Politiek en samenleving","Politics and society","Politik und Gesellschaft"),sub:T("Democratie, macht en ideeën","Democracy, power and ideas","Demokratie, Macht und Ideen"),topics:["Politiek","Geschiedenis","Filosofie"]},
+ {id:"wetenschap",label:T("Nieuwsgierig naar wetenschap","Curious about science","Neugierig auf Wissenschaft"),sub:T("Hoe het universum en leven werken","How the universe and life work","Wie Universum und Leben funktionieren"),topics:["Wetenschap","Natuur"]},
+ {id:"natuur",label:T("Natuur en dieren","Nature and animals","Natur und Tiere"),sub:T("Ecologie, dieren en klimaat","Ecology, animals and climate","Ökologie, Tiere und Klima"),topics:["Natuur","Wetenschap"]},
+ {id:"tech",label:T("Technologie en de toekomst","Technology and the future","Technologie und Zukunft"),sub:T("AI, internet en innovatie","AI, the internet and innovation","KI, Internet und Innovation"),topics:["Technologie","Economie"]},
+ {id:"geschiedenis",label:T("Geschiedenis","History","Geschichte"),sub:T("Van de oudheid tot nu","From antiquity to today","Von der Antike bis heute"),topics:["Geschiedenis","Politiek"]}];
+const PACES=[{n:3,label:T("Licht","Light","Leicht"),min:3},{n:5,label:T("Normaal","Normal","Normal"),min:5},{n:8,label:T("Serieus","Serious","Ernsthaft"),min:8},{n:12,label:T("Fanatiek","Dedicated","Ehrgeizig"),min:12}];
+const paceSub=p=>T(`± ${p.min} minuten per dag`,`About ${p.min} minutes a day`,`Etwa ${p.min} Minuten am Tag`);
+const nIdeas=n=>T(`${n} ${n===1?"idee":"ideeën"}`,`${n} ${n===1?"idea":"ideas"}`,`${n} ${n===1?"Idee":"Ideen"}`);
+const streakTxt=n=>T(`Reeks: ${n} ${n===1?"dag":"dagen"}`,`Streak: ${n} ${n===1?"day":"days"}`,`Serie: ${n} ${n===1?"Tag":"Tage"}`);
+const NOSUM=T("Van dit boek kan geen betrouwbare samenvatting worden gemaakt","No reliable summary can be made of this book","Für dieses Buch lässt sich keine verlässliche Zusammenfassung erstellen");
 const TC=["--t1","--t2","--t3","--t4","--t5","--t6"];
 function topicColor(t){const i=TOPICS.indexOf(t);let h=i>=0?i:[...String(t||"")].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,0);return `var(${TC[h%TC.length]})`}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -263,7 +316,7 @@ function lsSet(){try{localStorage.setItem("ideely",JSON.stringify({books:LOCAL?S
 (function(){const l=lsGet();if(l){S.books=l.books||[];S.saved=l.saved||[];S.deep=l.deep||{};S.shared=l.shared||{};Object.assign(S.prof,l.prof||{})}})();
 
 async function initStore(){
-  for(const b of LISTBOOKS)applyShared(b,S.shared[b.id]);
+  for(const b of ALL)if(b.lazy)applyShared(b,S.shared[SK(b.id)]);
   storeReady=true;render();
   if(!S.prof.onboarded)openOnboarding();
 }
@@ -282,158 +335,234 @@ const prog=b=>Math.min(S.prof.progress[b.id]||0,b.ideas.length);
 const finished=b=>!b.live&&b.ideas.length>0&&prog(b)>=b.ideas.length;
 
 /* ---------- aanbevelingen ---------- */
+/* Profiel (doelen en onderwerpen) plus wat je echt leest: begonnen boeken tellen mee, uitgelezen boeken dubbel */
 function topicWeights(){const w={};for(const t of S.prof.topics||[])w[t]=(w[t]||0)+3;
-  for(const g of S.prof.goals||[]){const G=GOALS.find(x=>x.id===g);if(G)G.topics.forEach((t,i)=>w[t]=(w[t]||0)+(i===0?2:1))}return w}
+  for(const g of S.prof.goals||[]){const G=GOALS.find(x=>x.id===g);if(G)G.topics.forEach((t,i)=>w[t]=(w[t]||0)+(i===0?2:1))}
+  for(const [id,n] of Object.entries(S.prof.progress||{})){if(!n)continue;const b=findBook(id);if(b&&b.topic)w[b.topic]=(w[b.topic]||0)+(finished(b)?2:1)}
+  return w}
 function whyFor(b){const gs=(S.prof.goals||[]).map(g=>GOALS.find(x=>x.id===g)).filter(G=>G&&G.topics.includes(b.topic));
-  if(gs.length)return "Voor: "+gs[0].label.toLowerCase();if((S.prof.topics||[]).includes(b.topic))return "Jij volgt "+b.topic;return ""}
+  if(gs.length)return T("Voor: ","For: ","Für: ")+gs[0].label.toLowerCase();
+  if((S.prof.topics||[]).includes(b.topic))return T("Jij volgt ","You follow ","Du folgst ")+tn(b.topic);return ""}
+const dayRnd=id=>{let h=2166136261;for(const c of dayKey()+id)h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0)/4294967296};
 function recommended(limit){const w=topicWeights(),read=new Set(S.prof.read||[]);
-  const d=dayKey(),rnd=id=>{let h=2166136261;for(const c of d+id)h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0)/4294967296};
-  return ALL.filter(b=>!read.has(b.id)&&prog(b)===0&&!b.unknown).map(b=>({b,w:w[b.topic]||0,s:(w[b.topic]||0)+(b.lazy?0:0.6)+rnd(b.id)*0.9})).filter(x=>x.w>0||!Object.keys(w).length).sort((a,c)=>c.s-a.s).slice(0,limit).map(x=>x.b)}
+  return ALL.filter(b=>!read.has(b.id)&&prog(b)===0&&!b.unknown).map(b=>({b,w:w[b.topic]||0,s:(w[b.topic]||0)+(b.lazy?0:0.6)+dayRnd(b.id)*0.9})).filter(x=>x.w>0||!Object.keys(w).length).sort((a,c)=>c.s-a.s).slice(0,limit).map(x=>x.b)}
+/* Het laatste boek waar je echt in las (minstens 3 ideeën) */
+function lastRead(){const t=S.prof.touched||{};
+  return Object.keys(S.prof.progress||{}).filter(id=>(S.prof.progress[id]||0)>=3).map(findBook).filter(b=>b&&b.topic&&!b.kind).sort((a,b)=>(t[b.id]||0)-(t[a.id]||0))[0]||null}
+/* "Omdat je X las": ongelezen boeken uit hetzelfde onderwerp */
+function becauseRead(limit,skip=[]){const from=lastRead();if(!from)return null;const read=new Set([...(S.prof.read||[]),...skip]);
+  const books=ALL.filter(b=>b.topic===from.topic&&b.id!==from.id&&!read.has(b.id)&&prog(b)===0&&!b.unknown).sort((a,b)=>dayRnd(a.id)-dayRnd(b.id)).slice(0,limit);
+  return books.length?{from,books}:null}
 
 /* ---------- dagdoel en reeks ---------- */
 function rollDay(){const t=dayKey();if(S.prof.day!==t){const y=dayKey(new Date(Date.now()-864e5));
   if(S.prof.last!==y&&S.prof.last!==t)S.prof.streak=0;S.prof.day=t;S.prof.count=0}}
 function countRead(){rollDay();S.prof.count++;const t=dayKey();
-  if(S.prof.count===S.prof.goal&&S.prof.last!==t){const y=dayKey(new Date(Date.now()-864e5));S.prof.streak=(S.prof.last===y?S.prof.streak:0)+1;S.prof.last=t;setTimeout(scheduleReminders,0);toast("Dagdoel gehaald. Reeks: "+S.prof.streak+" "+(S.prof.streak===1?"dag":"dagen"))}
+  if(S.prof.count===S.prof.goal&&S.prof.last!==t){const y=dayKey(new Date(Date.now()-864e5));S.prof.streak=(S.prof.last===y?S.prof.streak:0)+1;S.prof.last=t;setTimeout(scheduleReminders,0);toast(T("Dagdoel gehaald. ","Daily goal reached. ","Tagesziel erreicht. ")+streakTxt(S.prof.streak))}
   profChanged()}
 
 /* ---------- weergave ---------- */
 let tab="home";
 const main=document.getElementById("main");
-document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();main.scrollTop=0});
-document.getElementById("profbtn").onclick=()=>openOnboarding(true);
+const NAVL={home:T("Voor jou","For you","Für dich"),ontdek:T("Ontdek","Discover","Entdecken"),bewaard:T("Bewaard","Saved","Gespeichert")};
+document.querySelectorAll("nav.tabs button").forEach(b=>{b.lastChild.textContent=NAVL[b.dataset.tab];b.onclick=()=>{tab=b.dataset.tab;render();main.scrollTop=0}});
+document.querySelector("nav.tabs").setAttribute("aria-label",T("Hoofdmenu","Main menu","Hauptmenü"));
+const PB=document.getElementById("profbtn");PB.setAttribute("aria-label",T("Je profiel","Your profile","Dein Profil"));PB.onclick=()=>openOnboarding(true);
 
 function ring(){rollDay();const g=S.prof.goal,c=Math.min(S.prof.count,g),C=2*Math.PI*26;
   return `<svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><circle class="track" cx="32" cy="32" r="26"/><circle class="bar" cx="32" cy="32" r="26" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-c/g)}" transform="rotate(-90 32 32)"/><text x="32" y="38" text-anchor="middle">${c}/${g}</text></svg>`}
 
 function bookCard(b,opt={}){const n=b.ideas.length||8,p=prog(b);
   return `<button class="book" style="--tc:${topicColor(b.topic)}" data-open="${esc(b.id)}">
-    <span class="topic">${esc(b.topic||"Overig")}</span>
+    <span class="topic">${esc(tn(b.topic)||T("Overig","Other","Sonstiges"))}</span>
     <span class="ttl">${esc(b.titleNl||b.title)}</span>
     <span class="au">${esc(b.author||b.source||"")}</span>
     ${opt.why&&whyFor(b)?`<span class="why">${esc(whyFor(b))}</span>`:""}
-    ${b.kind==="tekst"?'<span class="tag">artikel</span>':""}
+    ${b.kind==="tekst"?`<span class="tag">${T("artikel","article","Artikel")}</span>`:""}
     <span class="meter"><i style="width:${n?p/n*100:0}%"></i></span>
-    <span class="count">${p>=n?"Gelezen":p?p+" / "+n+" ideeën":n+" ideeën · ± "+Math.max(2,Math.round(n*0.8))+" min"}</span></button>`}
+    <span class="count">${p>=n?T("Gelezen","Read","Gelesen"):p?p+" / "+nIdeas(n):nIdeas(n)+" · ± "+Math.max(2,Math.round(n*0.8))+" min"}</span></button>`}
 
 function render(){
   document.querySelectorAll("nav.tabs button").forEach(b=>{if(b.dataset.tab===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   rollDay();
-  document.getElementById("streak").textContent=S.prof.streak?`Reeks: ${S.prof.streak} ${S.prof.streak===1?"dag":"dagen"}`:"";
+  document.getElementById("streak").textContent=S.prof.streak?streakTxt(S.prof.streak):"";
   if(tab==="home")renderHome();else if(tab==="ontdek")renderDiscover();else renderSaved();
 }
 function bindOpen(root=main){root.querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>openReader(el.dataset.open))}
+
+const IC={
+  book:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>',
+  spark:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>',
+  layers:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>',
+  bell:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>',
+  clock:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  compass:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg>',
+  user:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  widget:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="18" height="8" rx="2"/></svg>'};
+
+/* Uitleg over de widget: wat het is en hoe je hem neerzet */
+function widgetHelp(){
+  if(NATIVE&&PLATFORM==="ios")return T("De widget is een blokje op je beginscherm met het idee van de dag, je dagdoel en je reeks. Voor de iPhone komt hij in een volgende versie.","The widget is a small block on your home screen showing the idea of the day, your daily goal and your streak. It's coming to iPhone in a later version.","Das Widget ist ein kleiner Block auf deinem Startbildschirm mit der Idee des Tages, deinem Tagesziel und deiner Serie. Für das iPhone kommt es in einer späteren Version.");
+  const what=T("De widget is een blokje op het beginscherm van je telefoon met het idee van de dag, je dagdoel en je reeks. Tik erop en Ideely opent.","The widget is a small block on your phone's home screen showing the idea of the day, your daily goal and your streak. Tap it to open Ideely.","Das Widget ist ein kleiner Block auf dem Startbildschirm deines Handys mit der Idee des Tages, deinem Tagesziel und deiner Serie. Tippe darauf, um Ideely zu öffnen.");
+  if(!NATIVE)return what+" "+T("Hij werkt in de Android-app.","It works in the Android app.","Es funktioniert in der Android-App.");
+  return what+" "+T("Zo zet je hem neer: houd een lege plek op je beginscherm ingedrukt, kies Widgets, zoek Ideely en sleep hem naar je scherm.","To add it: press and hold an empty spot on your home screen, choose Widgets, find Ideely and drag it onto your screen.","So fügst du es hinzu: Halte eine freie Stelle auf dem Startbildschirm gedrückt, wähle Widgets, suche Ideely und ziehe es auf den Bildschirm.")}
 
 function renderHome(){
   const all=[...ALL,...S.books];
   const busy=all.filter(b=>{const p=prog(b);return p>0&&p<b.ideas.length}).sort((a,b)=>(S.prof.touched?.[b.id]||0)-(S.prof.touched?.[a.id]||0));
   const recs=recommended(10);
+  const because=becauseRead(8,recs.map(b=>b.id));
   const own=S.books.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const done=all.filter(finished);
   const left=Math.max(S.prof.goal-S.prof.count,0);
+  const tip=NATIVE&&PLATFORM==="android"&&!S.prof.widgetTip;
+  const seg=(name,cur,opts)=>`<div class="seg3" role="group">${opts.map(([v,l])=>`<button data-${name}="${v}" aria-pressed="${v===cur}">${l}</button>`).join("")}</div>`;
   main.innerHTML=`
-  <div class="today">${ring()}<div><b>${left?`Nog ${left} ${left===1?"idee":"ideeën"} voor vandaag`:"Dagdoel gehaald"}</b>
-    <small>${busy.length?"Ga verder waar je gebleven was.":recs.length?"Begin met een aanbeveling hieronder.":"Zoek een boek via Ontdek."}</small></div></div>
-  ${busy.length?`<h2>Verder lezen</h2><div class="rail">${busy.map(b=>bookCard(b)).join("")}</div>`:""}
-  <div class="h2row"><h2>Aanbevolen voor jou</h2><button id="edit">Profiel aanpassen</button></div>
-  ${recs.length?`<div class="rail">${recs.map(b=>bookCard(b,{why:true})).join("")}</div>`:`<div class="empty">Je hebt alle aanbevolen boeken gelezen. Laat hieronder nieuwe boeken voorstellen.</div>`}
+  <div class="today">${ring()}<div><b>${left?T(`Nog ${nIdeas(left)} voor vandaag`,`${nIdeas(left)} to go today`,`Noch ${nIdeas(left)} für heute`):T("Dagdoel gehaald","Daily goal reached","Tagesziel erreicht")}</b>
+    <small>${busy.length?T("Ga verder waar je gebleven was.","Pick up where you left off.","Mach weiter, wo du aufgehört hast."):recs.length?T("Begin met een aanbeveling hieronder.","Start with a recommendation below.","Beginne mit einer Empfehlung unten."):T("Zoek een boek via Ontdek.","Find a book in Discover.","Finde ein Buch unter Entdecken.")}</small></div></div>
+  ${tip?`<div class="tip"><div class="ic">${IC.widget}</div><div><b>${T("Ideely op je beginscherm","Ideely on your home screen","Ideely auf dem Startbildschirm")}</b><p>${esc(widgetHelp())}</p><button class="btn ghost" id="tipok">${T("Begrepen","Got it","Verstanden")}</button></div></div>`:""}
+  ${busy.length?`<h2>${T("Verder lezen","Continue reading","Weiterlesen")}</h2><div class="rail">${busy.map(b=>bookCard(b)).join("")}</div>`:""}
+  <div class="h2row"><h2>${T("Aanbevolen voor jou","Recommended for you","Für dich empfohlen")}</h2><button id="edit">${T("Profiel aanpassen","Edit profile","Profil bearbeiten")}</button></div>
+  ${recs.length?`<div class="rail">${recs.map(b=>bookCard(b,{why:true})).join("")}</div>`:`<div class="empty">${T("Je hebt alle aanbevolen boeken gelezen. Laat hieronder nieuwe boeken voorstellen.","You've read all recommended books. Ask for new suggestions below.","Du hast alle empfohlenen Bücher gelesen. Lass dir unten neue vorschlagen.")}</div>`}
+  ${because?`<h2>${esc(T(`Omdat je ${because.from.titleNl||because.from.title} las`,`Because you read ${because.from.titleNl||because.from.title}`,`Weil du ${because.from.titleNl||because.from.title} gelesen hast`))}</h2><div class="rail">${because.books.map(b=>bookCard(b)).join("")}</div>`:""}
   ${aiBlock("home")}
-  ${own.length?`<h2>Zelf toegevoegd</h2><div class="shelf">${own.map(b=>bookCard(b)).join("")}</div>`:""}
-  ${done.length?`<h2>Uitgelezen</h2><div class="shelf">${done.map(b=>bookCard(b)).join("")}</div>`:""}
-  <div class="h2row"><h2>Back-up</h2></div>
-  <p class="lede">Je voortgang staat op dit toestel. Maak af en toe een back-up, zodat je hem kunt terugzetten op een ander toestel.</p>
-  <div class="row"><button class="btn ghost" id="bk-save">Back-up opslaan</button><button class="btn ghost" id="bk-load">Back-up terugzetten</button><input type="file" id="bk-file" accept="application/json,.json" hidden></div>`;
+  ${own.length?`<h2>${T("Zelf toegevoegd","Added by you","Selbst hinzugefügt")}</h2><div class="shelf">${own.map(b=>bookCard(b)).join("")}</div>`:""}
+  ${done.length?`<h2>${T("Uitgelezen","Finished","Ausgelesen")}</h2><div class="shelf">${done.map(b=>bookCard(b)).join("")}</div>`:""}
+  <h2>${T("Instellingen","Settings","Einstellungen")}</h2>
+  <div class="set">
+    <div class="setrow"><b>${T("Taal","Language","Sprache")}</b>${seg("lang",LANG,[["nl","Nederlands"],["en","English"],["de","Deutsch"]])}
+      <small>${T("De app en de samenvattingen verschijnen in deze taal. Een boek dat nog niet in die taal bestaat, wordt de eerste keer even gemaakt.","The app and the summaries appear in this language. A book that isn't available in it yet is created the first time you open it.","App und Zusammenfassungen erscheinen in dieser Sprache. Ein Buch, das es darin noch nicht gibt, wird beim ersten Öffnen erstellt.")}</small></div>
+    <div class="setrow"><b>${T("Weergave","Appearance","Darstellung")}</b>${seg("theme",S.prof.theme||"light",[["light",T("Licht","Light","Hell")],["dark",T("Donker","Dark","Dunkel")],["system",T("Als telefoon","Like phone","Wie Handy")]])}</div>
+    <div class="setrow"><b>${T("Widget","Widget","Widget")}</b><p>${esc(widgetHelp())}</p></div>
+    <div class="setrow"><b>${T("Back-up","Backup","Backup")}</b><p>${T("Je voortgang staat op dit toestel. Maak af en toe een back-up, zodat je hem kunt terugzetten op een ander toestel.","Your progress is stored on this device. Make a backup now and then so you can restore it on another device.","Dein Fortschritt ist auf diesem Gerät gespeichert. Mach ab und zu ein Backup, damit du ihn auf einem anderen Gerät wiederherstellen kannst.")}</p>
+      <div class="row"><button class="btn ghost" id="bk-save">${T("Back-up opslaan","Save backup","Backup speichern")}</button><button class="btn ghost" id="bk-load">${T("Back-up terugzetten","Restore backup","Backup wiederherstellen")}</button><input type="file" id="bk-file" accept="application/json,.json" hidden></div></div>
+  </div>`;
   document.getElementById("bk-save").onclick=saveBackup;
   document.getElementById("bk-load").onclick=()=>document.getElementById("bk-file").click();
   document.getElementById("bk-file").onchange=loadBackup;
   document.getElementById("edit").onclick=()=>openOnboarding(true);
+  const tk=document.getElementById("tipok");if(tk)tk.onclick=()=>{S.prof.widgetTip=1;profChanged();render()};
+  main.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+  main.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{S.prof.theme=b.dataset.theme;document.documentElement.dataset.theme=S.prof.theme;profChanged();render()});
   schedulePrefetch([...busy,...recs]);
   bindOpen();bindAi();
 }
+function setLang(l){if(!LANGS.includes(l)||l===LANG)return;S.prof.lang=l;lsSet();location.reload()}
 
 function renderSaved(){
   const list=[...S.saved].sort((a,b)=>(b.savedAt||0)-(a.savedAt||0));
-  main.innerHTML=`<h2>Bewaarde ideeën</h2>
+  main.innerHTML=`<h2>${T("Bewaarde ideeën","Saved ideas","Gespeicherte Ideen")}</h2>
   ${list.length?`<div class="saved">${list.map(s=>`<article class="sv" style="--tc:${topicColor(s.topic)}">
-    <h3>${esc(s.title)}</h3><p>${esc(s.body)}</p>${s.apply?`<div class="ap"><b>Toepassen:</b> ${esc(s.apply)}</div>`:""}
-    <footer><span>${esc(s.bookTitle)}</span><span><button data-go="${esc(s.bookId)}|${s.idx}">Open</button><button data-del="${esc(s.id)}">Verwijder</button></span></footer></article>`).join("")}</div>`
-  :`<div class="empty">Nog niets bewaard. Tik tijdens het lezen op <b>Bewaar</b> om een idee hier te verzamelen.</div>`}`;
-  main.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>delSaved(b.dataset.del).catch(()=>toast("Verwijderen lukte niet")));
-  main.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const[id,i]=b.dataset.go.split("|");if(findBook(id))openReader(id,+i+1);else toast("Dit boek staat niet meer in je bibliotheek")});
+    <h3>${esc(s.title)}</h3><p>${esc(s.body)}</p>${s.apply?`<div class="ap"><b>${T("Toepassen:","Apply:","Anwenden:")}</b> ${esc(s.apply)}</div>`:""}
+    <footer><span>${esc(s.bookTitle)}</span><span><button data-go="${esc(s.bookId)}|${s.idx}">${T("Open","Open","Öffnen")}</button><button data-del="${esc(s.id)}">${T("Verwijder","Remove","Entfernen")}</button></span></footer></article>`).join("")}</div>`
+  :`<div class="empty">${T("Nog niets bewaard. Tik tijdens het lezen op <b>Bewaar</b> om een idee hier te verzamelen.","Nothing saved yet. Tap <b>Save</b> while reading to collect an idea here.","Noch nichts gespeichert. Tippe beim Lesen auf <b>Speichern</b>, um eine Idee hier zu sammeln.")}</div>`}`;
+  main.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>delSaved(b.dataset.del).catch(()=>toast(T("Verwijderen lukte niet","Couldn't remove","Entfernen fehlgeschlagen"))));
+  main.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const[id,i]=b.dataset.go.split("|");if(findBook(id))openReader(id,+i+1);else toast(T("Dit boek staat niet meer in je bibliotheek","This book is no longer in your library","Dieses Buch ist nicht mehr in deiner Bibliothek"))});
 }
 
-/* ---------- profiel (onboarding) ---------- */
-const OB=document.getElementById("ob");let obStep=0,obDraft=null,obEdit=false;
-function openOnboarding(edit){obEdit=!!edit&&S.prof.onboarded;obStep=0;
-  obDraft={goals:[...(S.prof.goals||[])],topics:[...(S.prof.topics||[])],goal:S.prof.goal||5,read:[...(S.prof.read||[])],reminder:{...(S.prof.reminder||{on:true,time:"08:00"})}};
+/* ---------- welkom en profiel ---------- */
+/* Eerst drie korte welkomstschermen (met taalkeuze), daarna een profiel van vier stappen.
+   Onderwerpen worden afgeleid van je doelen; je ziet en verfijnt ze pas in de laatste stap. */
+const OB=document.getElementById("ob");let obStep=0,obDraft=null,obEdit=false,obIntro=-1;
+const deriveTopics=goals=>[...new Set(goals.flatMap(g=>GOALS.find(x=>x.id===g)?.topics||[]))];
+function openOnboarding(edit){obEdit=!!edit&&S.prof.onboarded;obStep=0;obIntro=obEdit||S.prof.introSeen?-1:0;
+  obDraft={goals:[...(S.prof.goals||[])],topics:[...(S.prof.topics||[])],custom:!!S.prof.topicsCustom,goal:S.prof.goal||5,read:[...(S.prof.read||[])],reminder:{...(S.prof.reminder||{on:true,time:"08:00"})}};
   OB.hidden=false;renderOb()}
+function renderIntro(){
+  const i=obIntro,last=i===2;let body="";
+  const feat=(ic,b,s)=>`<li><span class="ic">${IC[ic]}</span><div><b>${b}</b><span>${s}</span></div></li>`;
+  if(i===0)body=`<div class="seg3 langsel" role="group" aria-label="Taal · Language · Sprache">${[["nl","Nederlands"],["en","English"],["de","Deutsch"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${k===LANG}">${l}</button>`).join("")}</div>
+    <div class="hero"><div class="brand big">Idee<span>ly</span></div>
+    <h1>${T("Elke dag slimmer, in vijf minuten","Get smarter every day, in five minutes","Jeden Tag klüger, in fünf Minuten")}</h1>
+    <p class="lede">${T(`De kernideeën uit ${ALL.length} non-fictieboeken, kort en helder uitgelegd. Van psychologie en geld tot geschiedenis en wetenschap.`,`The key ideas from ${ALL.length} non-fiction books, explained briefly and clearly. From psychology and money to history and science.`,`Die Kernideen aus ${ALL.length} Sachbüchern, kurz und klar erklärt. Von Psychologie und Geld bis Geschichte und Wissenschaft.`)}</p></div>
+    <div class="demo" style="--tc:var(--t1)"><div class="kicker">Atomic Habits · James Clear</div>
+      <h3>${T("Systemen winnen van doelen","Systems beat goals","Systeme schlagen Ziele")}</h3>
+      <p>${T("Winnaars en verliezers hebben vaak dezelfde doelen. Het verschil zit in je systeem: de kleine, dagelijkse gewoontes die je resultaat bepalen.","Winners and losers often share the same goals. The difference is your system: the small daily habits that shape your results.","Gewinner und Verlierer haben oft dieselben Ziele. Der Unterschied liegt im System: den kleinen täglichen Gewohnheiten, die dein Ergebnis bestimmen.")}</p>
+      <div class="apply"><b>${T("Zo pas je het toe","How to apply it","So wendest du es an")}</b><span>${T("Kies één doel en schrijf op welke kleine handeling je er elke dag voor doet.","Pick one goal and write down the small action you'll take for it every day.","Wähle ein Ziel und schreib auf, welche kleine Handlung du jeden Tag dafür tust.")}</span></div></div>`;
+  else if(i===1)body=`<h1>${T("Zo werkt Ideely","How Ideely works","So funktioniert Ideely")}</h1>
+    <ul class="feat">
+      ${feat("book",T("Een boek in vijf minuten","A book in five minutes","Ein Buch in fünf Minuten"),T("Acht kernideeën per boek, één per kaart. Swipen en klaar.","Eight key ideas per book, one per card. Swipe and you're done.","Acht Kernideen pro Buch, eine pro Karte. Wischen, fertig."))}
+      ${feat("spark",T("Meteen bruikbaar","Useful straight away","Sofort nutzbar"),T("Bij elk idee een concrete actie of een vraag om over na te denken.","Every idea comes with a concrete action or a question to think about.","Zu jeder Idee gibt es eine konkrete Aktion oder eine Frage zum Nachdenken."))}
+      ${feat("layers",T("Dieper waar jij wilt","Deeper where you want","Tiefer, wo du willst"),T("Bewaar wat je raakt en lees een verdieping bij ideeën waar je meer van wilt weten.","Save what resonates and read a deep dive on ideas you want to know more about.","Speichere, was dich berührt, und lies eine Vertiefung zu Ideen, die dich interessieren."))}
+      ${feat("bell",T("Elke dag een klein moment","A small moment every day","Jeden Tag ein kleiner Moment"),T("Een herinnering op jouw tijd, een dagdoel en een reeks die je op gang houdt.","A reminder at your time, a daily goal and a streak that keeps you going.","Eine Erinnerung zu deiner Zeit, ein Tagesziel und eine Serie, die dich dranbleiben lässt."))}
+    </ul>`;
+  else body=`<h1>${T("Waarom het werkt","Why it works","Warum es funktioniert")}</h1>
+    <ul class="feat">
+      ${feat("clock",T("Klein en vaak houd je vol","Small and often sticks","Klein und oft hält man durch"),T("Een paar minuten per dag is makkelijker vol te houden dan af en toe een uur. Zo wordt lezen een gewoonte in plaats van een voornemen.","A few minutes a day is easier to keep up than an hour now and then. Reading becomes a habit instead of a resolution.","Ein paar Minuten am Tag hält man leichter durch als ab und zu eine Stunde. So wird Lesen zur Gewohnheit statt zum Vorsatz."))}
+      ${feat("compass",T("Meer boeken, betere keuzes","More books, better choices","Mehr Bücher, bessere Wahl"),T("Na vijf minuten weet je of een boek je iets brengt. De beste lees je daarna helemaal.","After five minutes you know whether a book is worth it. Then read the best ones in full.","Nach fünf Minuten weißt du, ob ein Buch dir etwas bringt. Die besten liest du dann ganz."))}
+      ${feat("user",T("Afgestemd op jou","Tailored to you","Auf dich abgestimmt"),T("Vertel in een minuut wat je wilt bereiken. Ideely kiest de boeken en leert van wat je leest.","Tell us in a minute what you want to achieve. Ideely picks the books and learns from what you read.","Erzähl in einer Minute, was du erreichen willst. Ideely wählt die Bücher und lernt aus dem, was du liest."))}
+    </ul>`;
+  OB.innerHTML=`<div class="ob-in intro"><div class="ob-top">${i>0?`<button id="ibk">${T("← Terug","← Back","← Zurück")}</button>`:""}<div class="dots">${[0,1,2].map(k=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>${i<2?`<button id="iskip">${T("Overslaan","Skip","Überspringen")}</button>`:""}</div>${body}</div>
+    <div class="ob-foot"><button class="btn wide" id="inext">${last?T("Stel mijn profiel samen","Set up my profile","Mein Profil einrichten"):T("Volgende","Next","Weiter")}</button><small>${last?T("Duurt ongeveer een minuut","Takes about a minute","Dauert etwa eine Minute"):"&nbsp;"}</small></div>`;
+  OB.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+  const bk=document.getElementById("ibk");if(bk)bk.onclick=()=>{obIntro--;renderOb()};
+  const sk=document.getElementById("iskip");if(sk)sk.onclick=()=>{obIntro=2;renderOb()};
+  document.getElementById("inext").onclick=()=>{if(last){obIntro=-1;obStep=0;S.prof.introSeen=true;lsSet()}else obIntro++;OB.querySelector(".ob-in").scrollTop=0;renderOb()};
+}
 function renderOb(){
-  const N=6,d=obDraft;let body="",foot="",ok=true;
+  if(obIntro>=0)return renderIntro();
+  const N=4,d=obDraft;let body="",foot="",ok=true;
+  if(!d.custom)d.topics=deriveTopics(d.goals);
   if(obStep===0){
-    body=`<h1>${obEdit?"Je profiel":"Welkom bij Ideely"}</h1>
-    <p class="lede">Elke dag een paar kernideeën uit de beste non-fictieboeken, in een paar minuten gelezen. Vertel eerst wat je wilt bereiken, dan stemmen we de aanbevelingen daarop af.</p>
-    <h2>Wat wil je verbeteren of ontdekken?</h2><p class="lede">Kies er een of meer.</p>
-    <div class="opts">${GOALS.map(g=>`<button class="opt" data-g="${g.id}" aria-pressed="${d.goals.includes(g.id)}"><b>${g.label}</b><small>${g.sub}</small></button>`).join("")}</div>`;
-    ok=d.goals.length>0;foot=ok?`${d.goals.length} gekozen`:"Kies minstens één doel";
+    body=`<h1>${T("Wat wil je bereiken?","What do you want to achieve?","Was möchtest du erreichen?")}</h1>
+    <p class="lede">${T("Kies wat je aanspreekt, zoveel als je wilt. Daarop kiezen we de boeken voor je uit.","Pick whatever appeals to you, as many as you like. We'll choose books to match.","Wähle, was dich anspricht, so viel du willst. Danach suchen wir die Bücher für dich aus.")}</p>
+    <div class="opts">${GOALS.map(g=>`<button class="opt" data-g="${g.id}" aria-pressed="${d.goals.includes(g.id)}"><b>${esc(g.label)}</b><small>${esc(g.sub)}</small></button>`).join("")}</div>`;
+    ok=d.goals.length>0;foot=ok?T(`${d.goals.length} gekozen`,`${d.goals.length} selected`,`${d.goals.length} ausgewählt`):T("Kies er minstens één","Pick at least one","Wähle mindestens eins");
   }else if(obStep===1){
-    const sug=new Set(d.goals.flatMap(g=>GOALS.find(x=>x.id===g)?.topics||[]));
-    if(!d.topics.length)d.topics=[...sug];
-    body=`<h1>Welke onderwerpen interesseren je?</h1>
-    <p class="lede">We hebben er alvast een paar gekozen op basis van je doelen. Kies er minstens drie.</p>
-    <div class="chips" style="margin-top:14px">${TOPICS.map(t=>`<button class="chip" data-t="${t}" aria-pressed="${d.topics.includes(t)}">${t}</button>`).join("")}</div>`;
-    ok=d.topics.length>=3;foot=ok?`${d.topics.length} onderwerpen`:`Nog ${3-d.topics.length} te kiezen`;
-  }else if(obStep===2){
-    body=`<h1>Hoeveel wil je per dag lezen?</h1>
-    <p class="lede">Je dagdoel telt het aantal nieuwe ideeën. Haal je het elke dag, dan groeit je reeks.</p>
-    <div class="opts one">${PACES.map(p=>`<button class="opt row2" data-p="${p.n}" aria-pressed="${d.goal===p.n}"><span><b>${p.label}</b><small style="display:block">${p.sub}</small></span><b>${p.n} ideeën</b></button>`).join("")}</div>`;
-  }else if(obStep===3){
     const times=["07:30","08:00","12:30","18:00","20:00","21:30"];
-    body=`<h1>Wanneer wil je lezen?</h1>
-    <p class="lede">Op dit moment krijg je een korte herinnering met het idee van de dag. Vaste momenten maken er een gewoonte van.</p>
-    <div class="chips" style="margin-top:14px">${times.map(t=>`<button class="chip" data-tm="${t}" aria-pressed="${d.reminder.on&&d.reminder.time===t}">${t}</button>`).join("")}
-      <button class="chip" data-tm="off" aria-pressed="${!d.reminder.on}">Geen herinnering</button></div>
-    ${NATIVE?"":`<p class="note">Herinneringen werken in de app op je telefoon.</p>`}`;
-    foot=d.reminder.on?`Elke dag om ${d.reminder.time}`:"Geen herinneringen";
-  }else if(obStep===4){
+    body=`<h1>${T("Jouw leesritme","Your reading rhythm","Dein Leserhythmus")}</h1>
+    <p class="lede">${T("Hoeveel nieuwe ideeën per dag? Haal je je dagdoel, dan groeit je reeks.","How many new ideas a day? Hit your daily goal and your streak grows.","Wie viele neue Ideen pro Tag? Erreichst du dein Tagesziel, wächst deine Serie.")}</p>
+    <div class="opts one">${PACES.map(p=>`<button class="opt row2" data-p="${p.n}" aria-pressed="${d.goal===p.n}"><span><b>${p.label}</b><small style="display:block">${paceSub(p)}</small></span><b>${nIdeas(p.n)}</b></button>`).join("")}</div>
+    <h2>${T("Wanneer wil je een herinnering?","When would you like a reminder?","Wann möchtest du erinnert werden?")}</h2>
+    <p class="lede">${T("Met het idee van de dag, of een boek dat past bij wat je leest.","With the idea of the day, or a book that fits what you're reading.","Mit der Idee des Tages oder einem Buch, das zu deiner Lektüre passt.")}</p>
+    <div class="chips">${times.map(t=>`<button class="chip" data-tm="${t}" aria-pressed="${d.reminder.on&&d.reminder.time===t}">${t}</button>`).join("")}
+      <button class="chip" data-tm="off" aria-pressed="${!d.reminder.on}">${T("Geen herinnering","No reminder","Keine Erinnerung")}</button></div>
+    ${NATIVE?"":`<p class="note">${T("Herinneringen werken in de app op je telefoon.","Reminders work in the app on your phone.","Erinnerungen funktionieren in der App auf deinem Handy.")}</p>`}`;
+    foot=nIdeas(d.goal)+T(" per dag"," a day"," pro Tag")+" · "+(d.reminder.on?T("herinnering om ","reminder at ","Erinnerung um ")+d.reminder.time:T("geen herinnering","no reminder","keine Erinnerung"));
+  }else if(obStep===2){
     const w={};d.topics.forEach(t=>w[t]=3);d.goals.forEach(g=>GOALS.find(x=>x.id===g)?.topics.forEach(t=>w[t]=(w[t]||0)+1));
-    const rel=ALL.filter(b=>w[b.topic]).sort((a,b)=>(w[b.topic]||0)-(w[a.topic]||0)||(a.lazy?1:0)-(b.lazy?1:0)).slice(0,40);
-    body=`<h1>Welke boeken heb je al gelezen?</h1>
-    <p class="lede">Die slaan we over bij je aanbevelingen. Je kunt ze later altijd nog openen.</p>
-    <div class="opts one">${rel.map(b=>`<button class="opt row2" data-r="${b.id}" aria-pressed="${d.read.includes(b.id)}"><span><b>${esc(b.titleNl||b.title)}</b><small style="display:block">${esc(b.author)}</small></span><small>${d.read.includes(b.id)?"Gelezen":""}</small></button>`).join("")}</div>`;
-    foot=d.read.length?`${d.read.length} gelezen`:"Overslaan mag ook";
+    const rel=ALL.filter(b=>w[b.topic]).sort((a,b)=>(w[b.topic]||0)-(w[a.topic]||0)||(a.catalog?0:1)-(b.catalog?0:1)).slice(0,40);
+    body=`<h1>${T("Welke boeken heb je al gelezen?","Which books have you already read?","Welche Bücher hast du schon gelesen?")}</h1>
+    <p class="lede">${T("Die slaan we over bij je aanbevelingen. Je kunt ze later altijd nog openen.","We'll skip those in your recommendations. You can still open them any time.","Die überspringen wir bei deinen Empfehlungen. Öffnen kannst du sie trotzdem jederzeit.")}</p>
+    <div class="opts one">${rel.map(b=>`<button class="opt row2" data-r="${b.id}" aria-pressed="${d.read.includes(b.id)}"><span><b>${esc(b.titleNl||b.title)}</b><small style="display:block">${esc(b.author)}</small></span><small>${d.read.includes(b.id)?T("Gelezen","Read","Gelesen"):""}</small></button>`).join("")}</div>`;
+    foot=d.read.length?T(`${d.read.length} gelezen`,`${d.read.length} read`,`${d.read.length} gelesen`):T("Overslaan mag ook","You can skip this","Überspringen geht auch");
   }else{
     const gl=d.goals.map(g=>GOALS.find(x=>x.id===g)?.label).filter(Boolean);
     const pace=PACES.find(p=>p.n===d.goal);
     const tmp={...S.prof,...d};const keep=S.prof;S.prof=tmp;const first=recommended(3);S.prof=keep;
-    body=`<h1>Je profiel staat klaar</h1>
-    <p class="lede">Hierop baseren we wat je te zien krijgt bij Voor jou.</p>
-    <dl class="prof"><div><dt>Doelen</dt><dd>${esc(gl.join(", "))}</dd></div>
-      <div><dt>Onderwerpen</dt><dd>${esc(d.topics.join(", "))}</dd></div>
-      <div><dt>Dagdoel</dt><dd>${pace?pace.label+", ":""}${d.goal} ideeën per dag</dd></div>
-      <div><dt>Herinnering</dt><dd>${d.reminder.on?"Elke dag om "+d.reminder.time:"Uit"}</dd></div>
-      ${first.length?`<div><dt>Om mee te beginnen</dt><dd>${first.map(b=>esc(b.titleNl||b.title)).join(" · ")}</dd></div>`:""}</dl>`;
+    body=`<h1>${obEdit?T("Je profiel","Your profile","Dein Profil"):T("Je profiel staat klaar","Your profile is ready","Dein Profil ist fertig")}</h1>
+    <p class="lede">${T("Hierop stemmen we Voor jou af. Wat je leest, telt daarna ook mee.","This shapes For you. What you read counts too.","Darauf stimmen wir Für dich ab. Was du liest, zählt danach mit.")}</p>
+    <dl class="prof"><div><dt>${T("Doelen","Goals","Ziele")}</dt><dd>${esc(gl.join(", "))}</dd></div>
+      <div><dt>${T("Dagdoel","Daily goal","Tagesziel")}</dt><dd>${pace?esc(pace.label)+", ":""}${nIdeas(d.goal)}${T(" per dag"," a day"," pro Tag")}</dd></div>
+      <div><dt>${T("Herinnering","Reminder","Erinnerung")}</dt><dd>${d.reminder.on?T("Elke dag om ","Every day at ","Jeden Tag um ")+d.reminder.time:T("Uit","Off","Aus")}</dd></div>
+      ${first.length?`<div><dt>${T("Om mee te beginnen","To start with","Zum Einstieg")}</dt><dd>${first.map(b=>esc(b.titleNl||b.title)).join(" · ")}</dd></div>`:""}</dl>
+    <h2>${T("Je onderwerpen","Your topics","Deine Themen")}</h2>
+    <p class="lede">${T("Afgeleid van je doelen. Tik om er een toe te voegen of weg te halen.","Based on your goals. Tap to add or remove one.","Abgeleitet von deinen Zielen. Tippe, um eins hinzuzufügen oder zu entfernen.")}</p>
+    <div class="chips">${TOPICS.map(t=>`<button class="chip" data-t="${t}" aria-pressed="${d.topics.includes(t)}">${esc(tn(t))}</button>`).join("")}</div>`;
+    ok=d.topics.length>0;foot=ok?"&nbsp;":T("Kies minstens één onderwerp","Pick at least one topic","Wähle mindestens ein Thema");
   }
   const last=obStep===N-1;
-  OB.innerHTML=`<div class="ob-in"><div class="ob-top">${obStep>0?`<button id="obback">← Terug</button>`:obEdit?`<button id="obclose">Sluiten</button>`:""}
+  const backBtn=obStep>0||!obEdit&&!S.prof.onboarded?`<button id="obback">${T("← Terug","← Back","← Zurück")}</button>`:obEdit?`<button id="obclose">${T("Sluiten","Close","Schließen")}</button>`:"";
+  OB.innerHTML=`<div class="ob-in"><div class="ob-top">${backBtn}
     <div class="steps">${Array.from({length:N},(_,i)=>`<i class="${i<=obStep?"on":""}"></i>`).join("")}</div></div>${body}</div>
-    <div class="ob-foot"><button class="btn wide" id="obnext" ${ok?"":"disabled"}>${last?(obEdit?"Profiel opslaan":"Begin met lezen"):"Volgende"}</button><small>${foot}</small></div>`;
-  OB.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g;d.goals=d.goals.includes(g)?d.goals.filter(x=>x!==g):[...d.goals,g];if(!obEdit)d.topics=[];renderOb()});
-  OB.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const t=b.dataset.t;d.topics=d.topics.includes(t)?d.topics.filter(x=>x!==t):[...d.topics,t];renderOb()});
+    <div class="ob-foot"><button class="btn wide" id="obnext" ${ok?"":"disabled"}>${last?(obEdit?T("Profiel opslaan","Save profile","Profil speichern"):T("Begin met lezen","Start reading","Los geht's")):T("Volgende","Next","Weiter")}</button><small>${foot}</small></div>`;
+  OB.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g;d.goals=d.goals.includes(g)?d.goals.filter(x=>x!==g):[...d.goals,g];renderOb()});
+  OB.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{const t=b.dataset.t;d.custom=true;d.topics=d.topics.includes(t)?d.topics.filter(x=>x!==t):[...d.topics,t];renderOb()});
   OB.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{d.goal=+b.dataset.p;renderOb()});
   OB.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{const t=b.dataset.tm;d.reminder=t==="off"?{...d.reminder,on:false}:{on:true,time:t};renderOb()});
   OB.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const r=b.dataset.r;d.read=d.read.includes(r)?d.read.filter(x=>x!==r):[...d.read,r];renderOb()});
-  const back=document.getElementById("obback");if(back)back.onclick=()=>{obStep--;renderOb()};
+  const back=document.getElementById("obback");if(back)back.onclick=()=>{if(obStep>0)obStep--;else obIntro=2;renderOb()};
   const cl=document.getElementById("obclose");if(cl)cl.onclick=()=>{OB.hidden=true};
   document.getElementById("obnext").onclick=()=>{if(!last){obStep++;OB.querySelector(".ob-in").scrollTop=0;renderOb();return}
     const first=!obEdit;
-    Object.assign(S.prof,{goals:d.goals,topics:d.topics,goal:d.goal,read:d.read,reminder:d.reminder,onboarded:true});aiRecs=null;
+    Object.assign(S.prof,{goals:d.goals,topics:d.topics,topicsCustom:d.custom,goal:d.goal,read:d.read,reminder:d.reminder,onboarded:true,introSeen:true});aiRecs=null;
     profChanged(true);OB.hidden=true;tab="home";render();main.scrollTop=0;scheduleReminders();
-    if(first&&GATED&&!isPremium())openPaywall("onboarding");else toast(obEdit?"Profiel opgeslagen":"Veel leesplezier")};
+    if(first&&GATED&&!isPremium())openPaywall("onboarding");else toast(obEdit?T("Profiel opgeslagen","Profile saved","Profil gespeichert"):T("Veel leesplezier","Happy reading","Viel Spaß beim Lesen"))};
 }
 
 /* ---------- Claude: aanbevelingen en genereren ---------- */
-const ERR={not_found:"Dit onderdeel is niet gevonden.",no_code:"Voor de AI-functies is een toegangscode nodig. De kant-en-klare samenvattingen kun je gewoon lezen.",not_configured:"De AI-functies zijn nog niet ingesteld: er ontbreekt een API-sleutel op de server.",bad_key:"De API-sleutel op de server wordt niet geaccepteerd. Controleer of je hem volledig hebt gekopieerd.",no_credit:"Er staat geen tegoed op je Anthropic-account. Zet tegoed op via Billing.",bad_model:"Het gekozen AI-model bestaat niet (meer). Laat het aanpassen.",offline:"Geen verbinding. Controleer je internet en probeer het opnieuw.",rate_limited:"Je hebt de limiet voor nu bereikt. Probeer het over een uur opnieuw.",forbidden:"Deze aanvraag werd geweigerd. Open de app via het gewone adres.",upstream_error:"De AI-dienst gaf een fout. Probeer het zo opnieuw.",refused:"Dit verzoek werd geweigerd. Probeer een andere titel.",invalid_json:"Het antwoord was onvolledig. Probeer het opnieuw.",prompt_too_large:"De tekst is te lang. Plak een kortere tekst."};
-const errMsg=e=>e?.code==="cancelled"?"Gestopt.":(ERR[e?.code]||"Er ging iets mis. Probeer het opnieuw.");
+const ERR={not_found:T("Dit onderdeel is niet gevonden.","This item wasn't found.","Dieser Inhalt wurde nicht gefunden."),no_code:T("Voor de AI-functies is een toegangscode nodig.","The AI features need an access code.","Für die KI-Funktionen ist ein Zugangscode nötig."),not_configured:T("De AI-functies zijn nog niet ingesteld op de server.","The AI features aren't set up on the server yet.","Die KI-Funktionen sind auf dem Server noch nicht eingerichtet."),bad_key:T("De API-sleutel op de server wordt niet geaccepteerd.","The server's API key isn't accepted.","Der API-Schlüssel auf dem Server wird nicht akzeptiert."),no_credit:T("Er staat geen tegoed op het AI-account.","There's no credit on the AI account.","Auf dem KI-Konto ist kein Guthaben."),bad_model:T("Het gekozen AI-model bestaat niet (meer).","The chosen AI model doesn't exist (any more).","Das gewählte KI-Modell gibt es nicht (mehr)."),offline:T("Geen verbinding. Controleer je internet en probeer het opnieuw.","No connection. Check your internet and try again.","Keine Verbindung. Prüfe dein Internet und versuch es erneut."),rate_limited:T("Je hebt de limiet voor nu bereikt. Probeer het over een uur opnieuw.","You've reached the limit for now. Try again in an hour.","Du hast das Limit für jetzt erreicht. Versuch es in einer Stunde erneut."),forbidden:T("Deze aanvraag werd geweigerd.","This request was refused.","Diese Anfrage wurde abgelehnt."),upstream_error:T("De AI-dienst gaf een fout. Probeer het zo opnieuw.","The AI service returned an error. Try again shortly.","Der KI-Dienst meldete einen Fehler. Versuch es gleich erneut."),refused:T("Dit verzoek werd geweigerd. Probeer een andere titel.","This request was refused. Try another title.","Diese Anfrage wurde abgelehnt. Versuch einen anderen Titel."),invalid_json:T("Het antwoord was onvolledig. Probeer het opnieuw.","The answer was incomplete. Please try again.","Die Antwort war unvollständig. Bitte versuch es erneut."),prompt_too_large:T("De tekst is te lang. Plak een kortere tekst.","The text is too long. Paste a shorter one.","Der Text ist zu lang. Füge einen kürzeren ein.")};
+const errMsg=e=>e?.code==="cancelled"?T("Gestopt.","Stopped.","Gestoppt."):(ERR[e?.code]||T("Er ging iets mis. Probeer het opnieuw.","Something went wrong. Please try again.","Etwas ist schiefgelaufen. Bitte versuch es erneut."));
 /* AI via de eigen serverfunctie /api/ai, beveiligd met een toegangscode */
 function getCode(){try{return (localStorage.getItem("ideely-code")||localStorage.getItem("ideeenstash-code"))||""}catch{return ""}}
 function setCode(c){try{localStorage.setItem("ideely-code",c)}catch{}}
@@ -490,23 +619,23 @@ function knownTitles(){return [...CATALOG,...S.books].map(b=>b.title+" ("+b.auth
 
 let aiRecs=null,aiBusy=false,aiTopic=null;
 function aiBlock(where){
-  const label=where==="home"?"Meer boeken voor jou":`Meer over ${aiTopic}`;
-  if(aiBusy)return `<p class="status"><span class="spin"></span>Boeken zoeken die bij je passen…</p>`;
-  if(!aiRecs||aiRecs.where!==where||(where==="ontdek"&&aiRecs.topic!==aiTopic))return `<button class="btn ghost wide" id="aimore" style="margin-top:14px">${label} laten voorstellen</button>`;
+  const label=where==="home"?T("Meer boeken voor jou","More books for you","Mehr Bücher für dich"):T("Meer over ","More on ","Mehr über ")+tn(aiTopic);
+  if(aiBusy)return `<p class="status"><span class="spin"></span>${T("Boeken zoeken die bij je passen…","Finding books that suit you…","Suche passende Bücher…")}</p>`;
+  if(!aiRecs||aiRecs.where!==where||(where==="ontdek"&&aiRecs.topic!==aiTopic))return `<button class="btn ghost wide" id="aimore" style="margin-top:14px">${T(label+" laten voorstellen","Suggest "+label.charAt(0).toLowerCase()+label.slice(1),label+" vorschlagen lassen")}</button>`;
   return `<h2>${label}</h2><div class="list">${aiRecs.items.map((s,i)=>{const have=matchCatalog(s.title);return `<div class="li"><div><b>${esc(s.title)}</b><small>${esc(s.author)}${s.year?", "+esc(s.year):""}</small><p>${esc(s.line)}</p></div>
-    ${have?`<button class="btn" data-open="${have.id}">Lees</button>`:`<button class="btn ghost" data-mk="${i}" ${gen&&!gen.done?"disabled":""}>Maak</button>`}</div>`}).join("")}</div>
-    <p class="note">Een nieuwe samenvatting maken duurt meestal 10 à 20 seconden; de eerste ideeën verschijnen al eerder.</p>`;
+    ${have?`<button class="btn" data-open="${have.id}">${T("Lees","Read","Lesen")}</button>`:`<button class="btn ghost" data-mk="${i}" ${gen&&!gen.done?"disabled":""}>${T("Maak","Create","Erstellen")}</button>`}</div>`}).join("")}</div>
+    <p class="note">${T("Een nieuwe samenvatting maken duurt meestal 10 à 20 seconden; de eerste ideeën verschijnen al eerder.","Creating a new summary usually takes 10 to 20 seconds; the first ideas appear sooner.","Eine neue Zusammenfassung dauert meist 10 bis 20 Sekunden; die ersten Ideen erscheinen früher.")}</p>`;
 }
 function bindAi(){const m=document.getElementById("aimore");if(m)m.onclick=()=>loadAiRecs(tab==="home"?"home":"ontdek");
   main.querySelectorAll("[data-mk]").forEach(b=>b.onclick=()=>{const s=aiRecs.items[+b.dataset.mk];makeBook(`${s.title} van ${s.author}`,aiRecs.topic)});bindOpen()}
 async function loadAiRecs(where){
   const sample=await getSample();if(!sample){toast("Claude is in deze weergave niet beschikbaar");return}
   aiBusy=true;render();
-  const focus=where==="ontdek"?`Onderwerp: ${aiTopic}.`:profileText();
+  const focus=where==="ontdek"?`Onderwerp: ${aiTopic} (${tn(aiTopic)}).`:profileText();
   try{
     const r=await sample.json(`Stel 8 bestaande, bekende non-fictieboeken voor aan een lezer van een leesapp met korte kernideeën. ${focus}
 Neem alleen boeken op waarvan je zeker weet dat ze bestaan, met de juiste auteur en het jaar van eerste uitgave, en waarvan je de inhoud goed kent. Sla deze boeken over, die heeft de lezer al: ${knownTitles()}.
-Antwoord met alleen een JSON-array: [{"title":"oorspronkelijke titel","author":"auteur","year":2018,"line":"één zin in het Nederlands waarom dit boek bij deze lezer past"}]`,{modelTier:"quick",maxTokens:1500});
+Antwoord met alleen een JSON-array: [{"title":"oorspronkelijke titel","author":"auteur","year":2018,"line":"één zin in ${LANG_IN} waarom dit boek bij deze lezer past"}]`,{modelTier:"quick",maxTokens:1500});
     aiRecs={where,topic:where==="ontdek"?aiTopic:null,items:(Array.isArray(r)?r:[]).filter(x=>x&&x.title).slice(0,10)};
   }catch(e){toast(errMsg(e))}
   aiBusy=false;render();
@@ -520,22 +649,22 @@ function renderDiscover(){
   const busy=gen&&!gen.done;
   const tb=aiTopic?ALL.filter(b=>b.topic===aiTopic):[];
   main.innerHTML=`
-  <h2>Zoek een boek</h2>
+  <h2>${T("Zoek een boek","Find a book","Buch suchen")}</h2>
   <div class="maker">
-    <div class="seg" role="group" aria-label="Bron">
-      <button id="m-boek" aria-pressed="${mode==="boek"}">Boek</button>
-      <button id="m-tekst" aria-pressed="${mode==="tekst"}">Artikel plakken</button></div>
+    <div class="seg" role="group" aria-label="${T("Bron","Source","Quelle")}">
+      <button id="m-boek" aria-pressed="${mode==="boek"}">${T("Boek","Book","Buch")}</button>
+      <button id="m-tekst" aria-pressed="${mode==="tekst"}">${T("Artikel plakken","Paste article","Artikel einfügen")}</button></div>
     ${mode==="boek"
-      ?`<input type="text" id="q" placeholder="Titel of auteur, bijv. Atomic Habits" autocomplete="off">`
-      :`<textarea id="q" placeholder="Plak hier de tekst van een artikel of blog"></textarea><input type="text" id="src" placeholder="Bron (optioneel), bijv. naam van de site">`}
-    <div class="row"><button class="btn" id="go" ${busy?"disabled":""}>${mode==="boek"?"Zoek of maak samenvatting":"Maak samenvatting"}</button>${busy?'<button class="btn ghost" id="openlive">Bekijk voortgang</button>':""}</div>
+      ?`<input type="text" id="q" placeholder="${T("Titel of auteur, bijv. Atomic Habits","Title or author, e.g. Atomic Habits","Titel oder Autor, z. B. Atomic Habits")}" autocomplete="off">`
+      :`<textarea id="q" placeholder="${T("Plak hier de tekst van een artikel of blog","Paste the text of an article or blog here","Füge hier den Text eines Artikels oder Blogs ein")}"></textarea><input type="text" id="src" placeholder="${T("Bron (optioneel), bijv. naam van de site","Source (optional), e.g. site name","Quelle (optional), z. B. Name der Website")}">`}
+    <div class="row"><button class="btn" id="go" ${busy?"disabled":""}>${mode==="boek"?T("Zoek of maak samenvatting","Find or create summary","Zusammenfassung finden oder erstellen"):T("Maak samenvatting","Create summary","Zusammenfassung erstellen")}</button>${busy?`<button class="btn ghost" id="openlive">${T("Bekijk voortgang","View progress","Fortschritt ansehen")}</button>`:""}</div>
     <div class="status ${statusErr?"err":""}">${busy?'<span class="spin"></span>':""}${esc(statusMsg)}</div>
   </div>
-  <h2>Per onderwerp</h2>
-  <div class="chips">${TOPICS.map(t=>`<button class="chip" data-t="${t}" aria-pressed="${t===aiTopic}">${t}</button>`).join("")}</div>
-  ${aiTopic?`<h2>${esc(aiTopic)}: direct te lezen</h2><div class="shelf">${tb.map(b=>bookCard(b)).join("")}</div>${aiBlock("ontdek")}`
-    :`<p class="lede" style="margin-top:14px">${ALL.length} boeken.</p>${TOPICS.map(t=>{const bs=ALL.filter(b=>b.topic===t);return bs.length?`<div class="h2row"><h2>${t}</h2><button data-t2="${t}">Alles (${bs.length})</button></div><div class="rail">${bs.slice(0,14).map(b=>bookCard(b)).join("")}</div>`:""}).join("")}`}
-  <p class="note">Nieuwe samenvattingen worden door AI in eigen woorden geschreven. Is een boek niet goed genoeg bekend, dan wordt er geen samenvatting gemaakt in plaats van iets te verzinnen.</p>`;
+  <h2>${T("Per onderwerp","By topic","Nach Thema")}</h2>
+  <div class="chips">${TOPICS.map(t=>`<button class="chip" data-t="${t}" aria-pressed="${t===aiTopic}">${esc(tn(t))}</button>`).join("")}</div>
+  ${aiTopic?`<h2>${esc(tn(aiTopic))}${T(": direct te lezen",": ready to read",": sofort lesbar")}</h2><div class="shelf">${tb.map(b=>bookCard(b)).join("")}</div>${aiBlock("ontdek")}`
+    :`<p class="lede" style="margin-top:14px">${ALL.length} ${T("boeken.","books.","Bücher.")}</p>${TOPICS.map(t=>{const bs=ALL.filter(b=>b.topic===t);return bs.length?`<div class="h2row"><h2>${esc(tn(t))}</h2><button data-t2="${t}">${T("Alles","All","Alle")} (${bs.length})</button></div><div class="rail">${bs.slice(0,14).map(b=>bookCard(b)).join("")}</div>`:""}).join("")}`}
+  <p class="note">${T("Nieuwe samenvattingen worden door AI in eigen woorden geschreven. Is een boek niet goed genoeg bekend, dan wordt er geen samenvatting gemaakt in plaats van iets te verzinnen.","New summaries are written by AI in its own words. If a book isn't known well enough, no summary is made rather than inventing anything.","Neue Zusammenfassungen schreibt eine KI in eigenen Worten. Ist ein Buch nicht gut genug bekannt, wird keine Zusammenfassung erstellt, statt etwas zu erfinden.")}</p>`;
   document.getElementById("m-boek").onclick=()=>{mode="boek";statusMsg="";renderDiscover()};
   document.getElementById("m-tekst").onclick=()=>{mode="tekst";statusMsg="";renderDiscover()};
   document.getElementById("go").onclick=()=>{const q=document.getElementById("q").value.trim();if(!q)return;
@@ -553,7 +682,7 @@ function setStatus(m,err){statusMsg=m;statusErr=!!err;if(tab==="ontdek")renderDi
 /* ---------- genereren met streaming ---------- */
 let gen=null;
 const NDJSON_RULES=`Antwoord in JSON Lines: één JSON-object per regel, zonder andere tekst, zonder codeblok.`;
-function bookPrompt(q,topicHint){return `Je maakt een samenvatting voor een leesapp met korte kernideeën: de kernideeën van één bestaand non-fictieboek, in je eigen woorden, in het Nederlands.
+function bookPrompt(q,topicHint){return `Je maakt een samenvatting voor een leesapp met korte kernideeën: de kernideeën van één bestaand non-fictieboek, in je eigen woorden, in ${LANG_IN}.
 
 Verzoek van de gebruiker: "${q}"
 
@@ -566,9 +695,10 @@ Regels:
 6. Topic is precies één van: ${TOPICS.join(", ")}.${topicHint?` (Waarschijnlijk ${topicHint}.)`:""}
 
 ${NDJSON_RULES}
-Regel 1: {"known":true,"title":"oorspronkelijke titel","titleNl":"bekende Nederlandse titel of null","author":"auteur","year":2016,"topic":"...","summary":"twee zinnen waar het boek over gaat"}
-Regel 2 tot en met 9: {"title":"...","body":"...","apply":"..."}`}
-function textPrompt(text){return `Je maakt een samenvatting voor een leesapp met korte kernideeën, van de tekst hieronder: de kernideeën, in je eigen woorden, in het Nederlands.
+Regel 1: {"known":true,"title":"oorspronkelijke titel","titleNl":"${T("bekende Nederlandse titel of null","bekende Engelse titel als die afwijkt van de oorspronkelijke, anders null","bekende Duitse titel of null")}","author":"auteur","year":2016,"topic":"...","summary":"twee zinnen waar het boek over gaat"}
+Regel 2 tot en met 9: {"title":"...","body":"...","apply":"..."}
+Schrijf alle tekst (summary, title, body, apply) in ${LANG_IN}.`}
+function textPrompt(text){return `Je maakt een samenvatting voor een leesapp met korte kernideeën, van de tekst hieronder: de kernideeën, in je eigen woorden, in ${LANG_IN}.
 Regels: gebruik alleen wat in de tekst staat, voeg niets toe. 4 tot 8 ideeën, elk met een titel (max. 8 woorden), een tekst van 50 tot 90 woorden die op zichzelf te begrijpen is, en een toepassing van één of twee zinnen met een concrete actie of reflectievraag. Topic is precies één van: ${TOPICS.join(", ")}.
 
 ${NDJSON_RULES}
@@ -579,62 +709,70 @@ TEKST:
 ${text.slice(0,60000)}`}
 
 async function runGen(prompt,label,extra){
-  const sample=await getSample();if(!sample){setStatus("Claude is in deze weergave niet beschikbaar.",true);return}
+  const sample=await getSample();if(!sample){setStatus(errMsg({code:"upstream_error"}),true);return}
   const id=(extra.kind==="tekst"?"t-":"b-")+Date.now().toString(36);
-  gen={book:{id,live:true,kind:extra.kind,source:extra.source||"",title:extra.guess||"Bezig…",author:"",topic:extra.topicHint||"Mindset",summary:"",ideas:[],createdAt:Date.now()},ctl:new AbortController(),done:false,meta:false};
+  gen={book:{id,live:true,kind:extra.kind,source:extra.source||"",title:extra.guess||T("Bezig…","Working…","Einen Moment…"),author:"",topic:extra.topicHint||"Mindset",summary:"",ideas:[],createdAt:Date.now()},ctl:new AbortController(),done:false,meta:false};
   const g=gen;setStatus(label);
   let pending="",gen_seen=0;
   const handle=line=>{line=line.trim().replace(/^```(json)?|```$/g,"").trim();if(!line)return;let o;try{o=JSON.parse(line)}catch{return}
-    if(!g.meta&&"known" in o){g.meta=true;if(!o.known){g.reject=o.reason||"Dit boek is niet betrouwbaar genoeg bekend.";return}
+    if(!g.meta&&"known" in o){g.meta=true;if(!o.known){g.reject=o.reason||NOSUM;return}
       Object.assign(g.book,{title:String(o.title||g.book.title),titleNl:o.titleNl&&o.titleNl!=="null"?String(o.titleNl):null,author:o.author&&o.author!=="null"?String(o.author):"",year:o.year||null,topic:TOPICS.includes(o.topic)?o.topic:g.book.topic,summary:String(o.summary||"")});
       if(!R.hidden&&rBook===g.book)liveMeta();return}
     if(g.meta&&!g.reject&&o.title&&o.body){g.book.ideas.push({title:String(o.title),body:String(o.body),apply:o.apply?String(o.apply):""});
-      if(g.book.ideas.length===1){setStatus("Eerste ideeën staan klaar.");if(tab==="ontdek"||extra.auto)openReader(g.book.id)}
+      if(g.book.ideas.length===1){setStatus(T("Eerste ideeën staan klaar.","First ideas are ready.","Die ersten Ideen sind fertig."));if(tab==="ontdek"||extra.auto)openReader(g.book.id)}
       else if(!R.hidden&&rBook===g.book)liveAdd(g.book.ideas.length-1);}};
   try{
     await sample(prompt,{modelTier:"default",maxTokens:4000,signal:g.ctl.signal,onText:({text})=>{const parts=text.split("\n");pending=parts.pop();parts.slice(gen_seen).forEach(handle);gen_seen=parts.length}});
     handle(pending);
   }catch(e){handle(pending);if(e?.code!=="cancelled"||!g.book.ideas.length){g.done=true;if(gen===g)gen=null;setStatus(errMsg(e),e?.code!=="cancelled");closeIfLive(g);return}}
   g.done=true;g.book.live=false;
-  if(g.reject){if(gen===g)gen=null;setStatus("Geen samenvatting gemaakt: "+g.reject,true);closeIfLive(g);toast("Geen samenvatting gemaakt");return}
-  if(g.book.ideas.length<2){if(gen===g)gen=null;setStatus("Het antwoord bevatte te weinig ideeën. Probeer het opnieuw.",true);closeIfLive(g);return}
-  try{const b={...g.book};delete b.live;await putBook(b);if(!R.hidden&&rBook===g.book)liveDone();setStatus("");toast("Samenvatting opgeslagen in je bibliotheek")}
-  catch(e){setStatus(e?.code==="quota_exceeded"?"Je opslag is vol. Verwijder eerst een paar eigen samenvattingen.":"Opslaan lukte niet. Probeer het opnieuw.",true)}
+  if(g.reject){if(gen===g)gen=null;setStatus(T("Geen samenvatting gemaakt: ","No summary made: ","Keine Zusammenfassung erstellt: ")+g.reject,true);closeIfLive(g);toast(T("Geen samenvatting gemaakt","No summary made","Keine Zusammenfassung erstellt"));return}
+  if(g.book.ideas.length<2){if(gen===g)gen=null;setStatus(T("Het antwoord bevatte te weinig ideeën. Probeer het opnieuw.","The answer had too few ideas. Please try again.","Die Antwort enthielt zu wenige Ideen. Bitte versuch es erneut."),true);closeIfLive(g);return}
+  try{const b={...g.book};delete b.live;await putBook(b);if(!R.hidden&&rBook===g.book)liveDone();setStatus("");toast(T("Samenvatting opgeslagen in je bibliotheek","Summary saved to your library","Zusammenfassung in deiner Bibliothek gespeichert"))}
+  catch(e){setStatus(e?.code==="quota_exceeded"?T("Je opslag is vol. Verwijder eerst een paar eigen samenvattingen.","Your storage is full. Remove a few of your own summaries first.","Dein Speicher ist voll. Entferne zuerst ein paar eigene Zusammenfassungen."):T("Opslaan lukte niet. Probeer het opnieuw.","Saving failed. Please try again.","Speichern fehlgeschlagen. Bitte versuch es erneut."),true)}
   if(gen===g)gen=null;render();
 }
 function closeIfLive(g){if(!R.hidden&&rBook===g.book)closeReader()}
-function makeBook(q,topicHint){if(!isPremium()){openPaywall("own");return}if(gen&&!gen.done){toast("Er wordt al een samenvatting gemaakt");return}
-  tab="ontdek";render();runGen(bookPrompt(q,topicHint),`Kernideeën van “${q}” ophalen…`,{kind:"boek",guess:q,topicHint,auto:true})}
-function makeText(text,src){if(!isPremium()){openPaywall("own");return}if(gen&&!gen.done){toast("Er wordt al een samenvatting gemaakt");return}
-  runGen(textPrompt(text),"Tekst omzetten naar ideeën…",{kind:"tekst",source:src.trim(),auto:true})}
+function makeBook(q,topicHint){if(!isPremium()){openPaywall("own");return}if(gen&&!gen.done){toast(T("Er wordt al een samenvatting gemaakt","A summary is already being made","Es wird bereits eine Zusammenfassung erstellt"));return}
+  tab="ontdek";render();runGen(bookPrompt(q,topicHint),T(`Kernideeën van “${q}” ophalen…`,`Fetching key ideas from “${q}”…`,`Kernideen aus „${q}“ werden geholt…`),{kind:"boek",guess:q,topicHint,auto:true})}
+function makeText(text,src){if(!isPremium()){openPaywall("own");return}if(gen&&!gen.done){toast(T("Er wordt al een samenvatting gemaakt","A summary is already being made","Es wird bereits eine Zusammenfassung erstellt"));return}
+  runGen(textPrompt(text),T("Tekst omzetten naar ideeën…","Turning the text into ideas…","Text wird in Ideen umgewandelt…"),{kind:"tekst",source:src.trim(),auto:true})}
 
 /* ---------- lezer ---------- */
 const R=document.getElementById("reader");let rBook=null,rSlides=null;
 function ideaSlide(b,i){const it=b.ideas[i],sid=b.id+"_"+i,on=S.saved.some(s=>s.id===sid);
-  return `<section class="slide" data-i="${i}"><div class="kicker">Idee ${i+1}${b.live?"":" van "+b.ideas.length}</div>
+  return `<section class="slide" data-i="${i}"><div class="kicker">${ideaKicker(b,i)}</div>
     <h2>${esc(it.title)}</h2>${String(it.body).split(/\n+/).map(p=>`<p>${esc(p)}</p>`).join("")}
-    ${it.apply?`<div class="apply"><b>${KNOWLEDGE.includes(b.topic)?"Om over na te denken":"Zo pas je het toe"}</b><span>${esc(it.apply)}</span></div>`:""}
+    ${it.apply?`<div class="apply"><b>${KNOWLEDGE.includes(b.topic)?T("Om over na te denken","Something to think about","Zum Nachdenken"):T("Zo pas je het toe","How to apply it","So wendest du es an")}</b><span>${esc(it.apply)}</span></div>`:""}
     <div class="deep" id="deep-${i}" hidden></div>
-    <div class="acts"><button data-save="${i}" aria-pressed="${on}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v16l-6-4-6 4z"/></svg><span>${on?"Bewaard":"Bewaar"}</span></button>
-      <button data-deep="${i}" aria-expanded="false"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>${S.deep[sid]?"Toon verdieping":"Lees dieper"}</span></button></div></section>`}
-function coverInner(b){return `<div class="kicker">${esc(b.topic)} · ${b.live?(b.ideas.length?"wordt gemaakt":"wordt klaargezet…"):b.ideas.length+" ideeën"}</div>
+    <div class="acts"><button data-save="${i}" aria-pressed="${on}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v16l-6-4-6 4z"/></svg><span>${on?L_SAVED:L_SAVE}</span></button>
+      <button data-deep="${i}" aria-expanded="false"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>${S.deep[SK(b.id)+"_"+i]?L_SHOWDEEP:T("Lees dieper","Read deeper","Tiefer lesen")}</span></button></div></section>`}
+const L_SAVE=T("Bewaar","Save","Speichern"),L_SAVED=T("Bewaard","Saved","Gespeichert"),L_SHOWDEEP=T("Toon verdieping","Show deep dive","Vertiefung zeigen"),L_DEEP=T("Verdieping","Deep dive","Vertiefung");
+const L_WAIT=T("Even wachten tot de samenvatting klaar is","Wait until the summary is ready","Warte, bis die Zusammenfassung fertig ist");
+const ideaKicker=(b,i)=>b.live?T(`Idee ${i+1}`,`Idea ${i+1}`,`Idee ${i+1}`):T(`Idee ${i+1} van ${b.ideas.length}`,`Idea ${i+1} of ${b.ideas.length}`,`Idee ${i+1} von ${b.ideas.length}`);
+function coverInner(b){return `<div class="kicker">${esc(tn(b.topic))} · ${b.live?(b.ideas.length?T("wordt gemaakt","being written","wird erstellt"):T("wordt klaargezet…","getting ready…","wird vorbereitet…")):nIdeas(b.ideas.length)}</div>
   <h1>${esc(b.titleNl||b.title)}</h1>
   <p class="meta">${b.titleNl?esc(b.title)+"<br>":""}${esc(b.author||"")}${b.year?" · "+esc(b.year):""}${b.source?" · "+esc(b.source):""}</p>
   ${b.summary?`<p>${esc(b.summary)}</p>`:""}
-  <div class="hint">Swipe naar links om te beginnen →</div>
-  ${!b.catalog&&!b.live?`<div class="acts"><button id="rdel">Verwijder uit bibliotheek</button></div>`:""}`}
-function endInner(b){return b.live?`<div class="kicker">Even geduld</div><h2><span class="spin"></span>Volgende ideeën worden geschreven…</h2><p>Swipe zo terug om verder te lezen.</p>`
-  :`<div class="kicker">Klaar</div><h1>Uitgelezen</h1><p>Je hebt alle ${b.ideas.length} ideeën van ${esc(b.titleNl||b.title)} gelezen.</p>
-  <div class="acts"><button id="rdone">Terug</button><button id="rre">Opnieuw lezen</button></div>`}
+  <div class="hint">${T("Swipe naar links om te beginnen →","Swipe left to start →","Nach links wischen, um zu beginnen →")}</div>
+  ${!b.catalog&&!b.lazy&&!b.live?`<div class="acts"><button id="rdel">${T("Verwijder uit bibliotheek","Remove from library","Aus Bibliothek entfernen")}</button></div>`:""}`}
+function endInner(b){return b.live?`<div class="kicker">${T("Even geduld","One moment","Einen Moment")}</div><h2><span class="spin"></span>${T("Volgende ideeën worden geschreven…","More ideas are being written…","Weitere Ideen werden geschrieben…")}</h2><p>${T("Swipe zo terug om verder te lezen.","Swipe back in a moment to keep reading.","Wische gleich zurück, um weiterzulesen.")}</p>`
+  :`<div class="kicker">${T("Klaar","Done","Fertig")}</div><h1>${T("Uitgelezen","Finished","Ausgelesen")}</h1><p>${esc(T(`Je hebt alle ${b.ideas.length} ideeën van ${b.titleNl||b.title} gelezen.`,`You've read all ${b.ideas.length} ideas from ${b.titleNl||b.title}.`,`Du hast alle ${b.ideas.length} Ideen aus ${b.titleNl||b.title} gelesen.`))}</p>
+  ${endNext(b)}
+  <div class="acts"><button id="rdone">${T("Terug","Back","Zurück")}</button><button id="rre">${T("Opnieuw lezen","Read again","Erneut lesen")}</button></div>`}
+/* Na het uitlezen: een volgend boek uit hetzelfde onderwerp */
+function endNext(b){if(b.kind)return "";const read=new Set(S.prof.read||[]);
+  const nx=ALL.filter(x=>x.topic===b.topic&&x.id!==b.id&&!read.has(x.id)&&prog(x)===0&&!x.unknown).sort((a,c)=>dayRnd(a.id)-dayRnd(c.id))[0];
+  return nx?`<div class="apply"><b>${T("Lees hierna","Read next","Als Nächstes")}</b><span>${esc(nx.titleNl||nx.title)} · ${esc(nx.author||"")}</span></div><div class="acts" style="margin-top:8px;padding-top:0"><button data-next="${esc(nx.id)}">${T("Open dit boek","Open this book","Dieses Buch öffnen")}</button></div>`:""}
 
 function openReader(id,startAt){
   const b=findBook(id);if(!b)return;
-  if(b.unknown){toast("Van dit boek kan geen betrouwbare samenvatting worden gemaakt");return}
+  if(b.unknown){toast(NOSUM);return}
   if(!mayOpen(b)){openPaywall("book",b);return}
   if(b.lazy&&!b.ideas.length&&!b.live){loadShared(b);return}
   rBook=b;
   R.className="reader";R.style.setProperty("--tc",topicColor(b.topic));
-  R.innerHTML=`<div class="rbar"><button id="rclose" aria-label="Sluiten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  R.innerHTML=`<div class="rbar"><button id="rclose" aria-label="${T("Sluiten","Close","Schließen")}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="rprog">${b.ideas.map(()=>"<i></i>").join("")}</div></div>
   <div class="slides" id="slides"><section class="slide" id="rcover">${coverInner(b)}</section>${b.ideas.map((_,i)=>ideaSlide(b,i)).join("")}<section class="slide" id="rend">${endInner(b)}</section></div>`;
   R.hidden=false;rSlides=document.getElementById("slides");
@@ -659,16 +797,17 @@ function bindReader(){
   const dn=document.getElementById("rdone");if(dn)dn.onclick=closeReader;
   const re=document.getElementById("rre");if(re)re.onclick=()=>goSlide(1);
   const del=document.getElementById("rdel");
-  if(del)del.onclick=()=>{if(del.dataset.armed){delBook(b.id).then(()=>{closeReader();toast("Verwijderd")}).catch(()=>toast("Verwijderen lukte niet"))}else{del.dataset.armed=1;del.textContent="Tik nogmaals om te verwijderen"}};
+  if(del)del.onclick=()=>{if(del.dataset.armed){delBook(b.id).then(()=>{closeReader();toast(T("Verwijderd","Removed","Entfernt"))}).catch(()=>toast(T("Verwijderen lukte niet","Couldn't remove","Entfernen fehlgeschlagen")))}else{del.dataset.armed=1;del.textContent=T("Tik nogmaals om te verwijderen","Tap again to remove","Zum Entfernen erneut tippen")}};
+  R.querySelectorAll("[data-next]").forEach(x=>x.onclick=()=>{const id=x.dataset.next;closeReader();openReader(id)});
   R.querySelectorAll("[data-save]").forEach(btn=>{if(btn.dataset.bound)return;btn.dataset.bound=1;btn.onclick=async()=>{const i=+btn.dataset.save,sid=b.id+"_"+i,on=btn.getAttribute("aria-pressed")==="true",lab=btn.querySelector("span");
-    if(b.live){toast("Even wachten tot de samenvatting klaar is");return}
-    btn.setAttribute("aria-pressed",String(!on));lab.textContent=on?"Bewaar":"Bewaard";
-    try{if(on)await delSaved(sid);else await putSaved({id:sid,bookId:b.id,idx:i,title:b.ideas[i].title,body:b.ideas[i].body,apply:b.ideas[i].apply||"",bookTitle:(b.titleNl||b.title)+(b.author?" · "+b.author:""),topic:b.topic,savedAt:Date.now()});toast(on?"Verwijderd uit Bewaard":"Bewaard")}
-    catch(e){btn.setAttribute("aria-pressed",String(on));lab.textContent=on?"Bewaard":"Bewaar";toast("Opslaan lukte niet")}}});
+    if(b.live){toast(L_WAIT);return}
+    btn.setAttribute("aria-pressed",String(!on));lab.textContent=on?L_SAVE:L_SAVED;
+    try{if(on)await delSaved(sid);else await putSaved({id:sid,bookId:b.id,idx:i,title:b.ideas[i].title,body:b.ideas[i].body,apply:b.ideas[i].apply||"",bookTitle:(b.titleNl||b.title)+(b.author?" · "+b.author:""),topic:b.topic,savedAt:Date.now()});toast(on?T("Verwijderd uit Bewaard","Removed from Saved","Aus Gespeichert entfernt"):L_SAVED)}
+    catch(e){btn.setAttribute("aria-pressed",String(on));lab.textContent=on?L_SAVED:L_SAVE;toast(T("Opslaan lukte niet","Couldn't save","Speichern fehlgeschlagen"))}}});
   R.querySelectorAll("[data-deep]").forEach(btn=>{if(btn.dataset.bound)return;btn.dataset.bound=1;btn.onclick=()=>toggleDeep(b,+btn.dataset.deep,btn)});
 }
 let deepBusy=null;
-function renderDeep(box,text,note){box.innerHTML=`<div class="dk">Verdieping</div>${String(text).split(/\n\s*\n|\n/).filter(p=>p.trim()).map(p=>`<p>${esc(p)}</p>`).join("")}${note?`<small>${esc(note)}</small>`:""}`}
+function renderDeep(box,text,note){box.innerHTML=`<div class="dk">${L_DEEP}</div>${String(text).split(/\n\s*\n|\n/).filter(p=>p.trim()).map(p=>`<p>${esc(p)}</p>`).join("")}${note?`<small>${esc(note)}</small>`:""}`}
 function deepPrompt(b,it){
   const src=b.kind==="tekst"?`een artikel${b.title?` ("${b.title}")`:""}${b.source?` van ${b.source}`:""}`:`het boek "${b.title}" van ${b.author||"onbekende auteur"}${b.year?` (${b.year})`:""}`;
   return `Je schrijft een verdieping bij één idee uit ${src}, voor een leesapp met korte kernideeën. De lezer heeft deze korte kaart al gelezen:
@@ -676,7 +815,7 @@ function deepPrompt(b,it){
 Titel: ${it.title}
 Tekst: ${it.body}
 
-Schrijf in het Nederlands een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
+Schrijf in ${LANG_IN} een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
 - Leg de redenering of het mechanisme achter het idee uit zoals de auteur het onderbouwt. Herhaal de kaart niet.
 - Noem een voorbeeld, onderzoek of anekdote uit de bron alleen als je zeker weet dat die er echt in staat. Verzin geen cijfers, namen of citaten; twijfel je, laat het dan weg.
 - Geef een kanttekening of beperking als die relevant is, bijvoorbeeld kritiek op het idee.
@@ -684,22 +823,22 @@ Schrijf in het Nederlands een verdieping van 200 tot 300 woorden, in 3 of 4 kort
 ${b.kind==="tekst"?"Je hebt het artikel zelf niet; baseer je op de kaart en algemene kennis, en zeg dat als je verder gaat dan de kaart.\n":""}Platte tekst, alinea's gescheiden door een lege regel, geen kopjes, geen opsommingstekens, geen markdown.`}
 async function toggleDeep(b,i,btn){
   if(!isPremium()){openPaywall("deep");return}
-  const box=document.getElementById("deep-"+i),lab=btn.querySelector("span"),sid=b.id+"_"+i;
-  if(!box.hidden){box.hidden=true;btn.setAttribute("aria-expanded","false");lab.textContent="Toon verdieping";return}
-  box.hidden=false;btn.setAttribute("aria-expanded","true");lab.textContent="Verberg verdieping";
+  const box=document.getElementById("deep-"+i),lab=btn.querySelector("span"),sid=SK(b.id)+"_"+i;
+  if(!box.hidden){box.hidden=true;btn.setAttribute("aria-expanded","false");lab.textContent=L_SHOWDEEP;return}
+  box.hidden=false;btn.setAttribute("aria-expanded","true");lab.textContent=T("Verberg verdieping","Hide deep dive","Vertiefung ausblenden");
   if(S.deep[sid]){renderDeep(box,S.deep[sid]);return}
-  if(b.live){box.innerHTML=`<div class="dk">Verdieping</div><p>Even wachten tot de samenvatting klaar is.</p>`;return}
-  if(deepBusy){box.innerHTML=`<div class="dk">Verdieping</div><p>Er wordt al een andere verdieping geschreven. Probeer het zo opnieuw.</p>`;return}
-  box.innerHTML=`<div class="dk">Verdieping</div><p><span class="spin"></span>Bezig met schrijven…</p>`;
+  if(b.live){box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${L_WAIT}.</p>`;return}
+  if(deepBusy){box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${T("Er wordt al een andere verdieping geschreven. Probeer het zo opnieuw.","Another deep dive is being written. Try again in a moment.","Gerade wird eine andere Vertiefung geschrieben. Versuch es gleich noch einmal.")}</p>`;return}
+  box.innerHTML=`<div class="dk">${L_DEEP}</div><p><span class="spin"></span>${T("Bezig met schrijven…","Writing…","Wird geschrieben…")}</p>`;
   deepBusy=sid;
   try{
     const shared=b.catalog||b.lazy;
-    const r=shared?await streamGet(`${API}/api/deep?id=${encodeURIComponent(b.id)}&i=${i}`,text=>{if(box.isConnected)renderDeep(box,text)})
+    const r=shared?await streamGet(`${API}/api/deep?id=${encodeURIComponent(b.id)}&i=${i}${LQ}`,text=>{if(box.isConnected)renderDeep(box,text)})
       :await SAMPLE_FN(deepPrompt(b,b.ideas[i]),{modelTier:"default",maxTokens:1500,onText:({text})=>{if(!box.isConnected)return;renderDeep(box,text)}});
     if(r.json)throw aiErr("upstream_error","");
-    if(box.isConnected)renderDeep(box,r.text,r.truncated?"De verdieping is ingekort.":"");
+    if(box.isConnected)renderDeep(box,r.text,r.truncated?T("De verdieping is ingekort.","The deep dive was shortened.","Die Vertiefung wurde gekürzt."):"");
     putDeep(sid,r.text).catch(()=>{});
-  }catch(e){if(box.isConnected){if(e?.text)renderDeep(box,e.text,"Onderbroken: "+errMsg(e));else box.innerHTML=`<div class="dk">Verdieping</div><p>${esc(errMsg(e))}</p>`}}
+  }catch(e){if(box.isConnected){if(e?.text)renderDeep(box,e.text,T("Onderbroken: ","Interrupted: ","Unterbrochen: ")+errMsg(e));else box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${esc(errMsg(e))}</p>`}}
   finally{deepBusy=null}
 }
 /* Gedeelde samenvatting ophalen of één keer laten schrijven */
@@ -723,8 +862,8 @@ function prefetch(books){
 }
 function pumpPrefetch(){
   while(prefRunning<2&&prefQueue.length){const b=prefQueue.shift();if(b.ideas.length||PREF[b.id])continue;prefRunning++;
-    PREF[b.id]=fetch(API+"/api/book?warm=1&id="+encodeURIComponent(b.id)).then(r=>r.ok?r.json():null).then(j=>{
-      if(j&&j.data&&!b.ideas.length&&!b.live){S.shared={...S.shared,[b.id]:j.data};lsSet();applyShared(b,j.data)}
+    PREF[b.id]=fetch(API+"/api/book?warm=1&id="+encodeURIComponent(b.id)+LQ).then(r=>r.ok?r.json():null).then(j=>{
+      if(j&&j.data&&!b.ideas.length&&!b.live){S.shared={...S.shared,[SK(b.id)]:j.data};lsSet();applyShared(b,j.data)}
     }).catch(()=>{}).finally(()=>{prefRunning--;delete PREF[b.id];pumpPrefetch()});}
 }
 let prefTimer=null;
@@ -732,9 +871,9 @@ function schedulePrefetch(books){clearTimeout(prefTimer);prefTimer=setTimeout(()
 async function loadShared(b){
   if(PREF[b.id]){b.live=true;openReader(b.id,0);await PREF[b.id];b.live=false;
     if(b.ideas.length){if(!R.hidden&&rBook===b)openReader(b.id,0);return}
-    if(b.unknown){if(!R.hidden&&rBook===b)closeReader();toast("Van dit boek kan geen betrouwbare samenvatting worden gemaakt");return}
+    if(b.unknown){if(!R.hidden&&rBook===b)closeReader();toast(NOSUM);return}
     if(!R.hidden&&rBook===b)closeReader()}
-  if(gen&&!gen.done){toast("Er wordt al een samenvatting gemaakt. Even geduld.");return}
+  if(gen&&!gen.done){toast(T("Er wordt al een samenvatting gemaakt. Even geduld.","A summary is already being made. One moment.","Es wird bereits eine Zusammenfassung erstellt. Einen Moment."));return}
   b.live=true;b.ideas=[];b.summary="";
   const g=gen={book:b,done:false};
   openReader(b.id,0);
@@ -745,16 +884,16 @@ async function loadShared(b){
     if(meta&&!g.reject&&o.title&&o.body){b.ideas.push({title:String(o.title),body:String(o.body),apply:o.apply?String(o.apply):""});if(!R.hidden&&rBook===b)liveAdd(b.ideas.length-1)}};
   const fail=msg=>{b.live=false;b.ideas=[];g.done=true;if(gen===g)gen=null;if(!R.hidden&&rBook===b)closeReader();toast(msg)};
   try{
-    const r=await streamGet(API+"/api/book?id="+encodeURIComponent(b.id),text=>{const parts=text.split("\n");parts.pop();parts.slice(seen).forEach(handle);seen=parts.length});
-    if(r.json){b.live=false;g.done=true;if(gen===g)gen=null;const d=r.json.data;S.shared={...S.shared,[b.id]:d};lsSet();applyShared(b,d);
-      if(b.unknown){if(!R.hidden&&rBook===b)closeReader();toast("Van dit boek kan geen betrouwbare samenvatting worden gemaakt");return}
+    const r=await streamGet(API+"/api/book?id="+encodeURIComponent(b.id)+LQ,text=>{const parts=text.split("\n");parts.pop();parts.slice(seen).forEach(handle);seen=parts.length});
+    if(r.json){b.live=false;g.done=true;if(gen===g)gen=null;const d=r.json.data;S.shared={...S.shared,[SK(b.id)]:d};lsSet();applyShared(b,d);
+      if(b.unknown){if(!R.hidden&&rBook===b)closeReader();toast(NOSUM);return}
       if(!R.hidden&&rBook===b)openReader(b.id,Math.min(prog(b),b.ideas.length));return}
     const parts=r.text.split("\n");parts.slice(seen).forEach(handle);
   }catch(e){return fail(errMsg(e))}
-  if(g.reject!==undefined){b.unknown=true;S.shared={...S.shared,[b.id]:{known:false}};lsSet();return fail("Van dit boek kan geen betrouwbare samenvatting worden gemaakt")}
-  if(b.ideas.length<5)return fail("Het maken van deze samenvatting lukte niet. Probeer het later opnieuw.");
+  if(g.reject!==undefined){b.unknown=true;S.shared={...S.shared,[SK(b.id)]:{known:false}};lsSet();return fail(NOSUM)}
+  if(b.ideas.length<5)return fail(T("Het maken van deze samenvatting lukte niet. Probeer het later opnieuw.","Creating this summary didn't work. Please try again later.","Diese Zusammenfassung konnte nicht erstellt werden. Bitte versuch es später erneut."));
   b.live=false;g.done=true;if(gen===g)gen=null;
-  S.shared={...S.shared,[b.id]:{known:true,titleNl:b.titleNl||null,summary:b.summary,ideas:b.ideas}};lsSet();
+  S.shared={...S.shared,[SK(b.id)]:{known:true,titleNl:b.titleNl||null,summary:b.summary,ideas:b.ideas}};lsSet();
   if(!R.hidden&&rBook===b)liveDone();render();
 }
 function liveMeta(){R.style.setProperty("--tc",topicColor(rBook.topic));document.getElementById("rcover").innerHTML=coverInner(rBook);bindReader()}
@@ -765,7 +904,7 @@ function liveAdd(i){
   R.querySelector(".rprog").insertAdjacentHTML("beforeend","<i></i>");bindReader();
   liveCur=cur;goSlide(cur);requestAnimationFrame(()=>{goSlide(cur);liveCur=null;onPos()})}
 let liveCur=null;
-function liveDone(){R.querySelectorAll(".slide[data-i] .kicker").forEach(k=>{const i=+k.parentElement.dataset.i;k.textContent=`Idee ${i+1} van ${rBook.ideas.length}`});
+function liveDone(){R.querySelectorAll(".slide[data-i] .kicker").forEach(k=>{const i=+k.parentElement.dataset.i;k.textContent=ideaKicker(rBook,i)});
   document.getElementById("rcover").innerHTML=coverInner(rBook);document.getElementById("rend").innerHTML=endInner(rBook);
   const saved=S.books.find(x=>x.id===rBook.id);if(saved)rBook=saved;bindReader();lastPos=-1;onPos()}
 function closeReader(){R.hidden=true;R.innerHTML="";rBook=null;rSlides=null;lastPos=-1;profChanged(true);render()}
@@ -774,11 +913,11 @@ function saveBackup(){
   const data=JSON.stringify({app:"ideely",v:1,at:new Date().toISOString(),books:S.books,saved:S.saved,deep:S.deep,prof:S.prof});
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
   a.download="ideely-backup-"+dayKey()+".json";document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast("Back-up opgeslagen")}
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast(T("Back-up opgeslagen","Backup saved","Backup gespeichert"))}
 function loadBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result);if(d.app!=="ideely"&&d.app!=="ideeenstash")throw 0;
-    S.books=d.books||[];S.saved=d.saved||[];S.deep=d.deep||{};S.prof=Object.assign(S.prof,d.prof||{});lsSet();render();toast("Back-up teruggezet")}
-    catch{toast("Dit bestand is geen geldige back-up")}};r.readAsText(f);e.target.value=""}
+    S.books=d.books||[];S.saved=d.saved||[];S.deep=d.deep||{};S.prof=Object.assign(S.prof,d.prof||{});lsSet();render();toast(T("Back-up teruggezet","Backup restored","Backup wiederhergestellt"))}
+    catch{toast(T("Dit bestand is geen geldige back-up","This file isn't a valid backup","Diese Datei ist kein gültiges Backup"))}};r.readAsText(f);e.target.value=""}
 /* ================= App-laag: abonnement, herinneringen, widget ================= */
 const PLUG=n=>(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins[n])||null;
 const PLATFORM=NATIVE?window.Capacitor.getPlatform():"web";
@@ -805,7 +944,7 @@ async function rcInit(){
     P.addCustomerInfoUpdateListener?.(ci=>setPremium(!!ci?.entitlements?.active?.[RC_ENTITLEMENT]));
   }catch(e){}
 }
-const PWR={onboarding:"",book:"Je hebt je gratis boek van vandaag geopend.",deep:"Verdiepingen horen bij Premium.",own:"Zelf boeken en artikelen toevoegen hoort bij Premium."};
+const PWR={onboarding:"",book:T("Je hebt je gratis boek van vandaag geopend.","You've opened today's free book.","Du hast dein kostenloses Buch für heute geöffnet."),deep:T("Verdiepingen horen bij Premium.","Deep dives are part of Premium.","Vertiefungen gehören zu Premium."),own:T("Zelf boeken en artikelen toevoegen hoort bij Premium.","Adding your own books and articles is part of Premium.","Eigene Bücher und Artikel hinzufügen gehört zu Premium.")};
 const PW=document.getElementById("pw");let pwOffer=null,pwPick="ANNUAL",pwBusy=false,pwAfter=null;
 async function openPaywall(reason,book){
   pwAfter=book||null;PW.hidden=false;renderPaywall(reason);
@@ -817,27 +956,29 @@ function renderPaywall(reason){
   const goals=(S.prof.goals||[]).map(g=>GOALS.find(x=>x.id===g)?.label.toLowerCase()).filter(Boolean).slice(0,2);
   const yr=pkg("ANNUAL"),mo=pkg("MONTHLY");
   const trial=yr?.product?.introPrice?.price===0||!!yr?.product?.introPrice&&!yr.product.introPrice.price;
-  const perMonth=yr?.product?.price?(yr.product.price/12).toLocaleString("nl-NL",{style:"currency",currency:yr.product.currencyCode||"EUR"}):"";
+  const perMonth=yr?.product?.price?(yr.product.price/12).toLocaleString(LOCALE,{style:"currency",currency:yr.product.currencyCode||"EUR"}):"";
   const avail=!!(yr||mo);
   const sel=pwPick==="ANNUAL"?yr:mo;
+  const store=PLATFORM==="ios"?"App Store":"Google Play";
   const check='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
-  PW.innerHTML=`<div class="ob-in"><div class="ob-top"><span class="prem-tag">Premium</span><span style="flex:1"></span><button id="pwclose">Nu niet</button></div>
+  const gj=goals.join(T(" en "," and "," und "));
+  PW.innerHTML=`<div class="ob-in"><div class="ob-top"><span class="prem-tag">Premium</span><span style="flex:1"></span><button id="pwclose">${T("Nu niet","Not now","Nicht jetzt")}</button></div>
     ${PWR[reason]?`<p class="lede" style="margin-bottom:4px">${PWR[reason]}</p>`:""}
-    <h1>${goals.length?`Werk elke dag aan ${esc(goals.join(" en "))}`:"Haal alles uit Ideely"}</h1>
+    <h1>${goals.length?esc(T(`Werk elke dag aan ${gj}`,`Work on ${gj} every day`,`Jeden Tag ein Schritt: ${gj}`)):T("Haal alles uit Ideely","Get the most out of Ideely","Hol alles aus Ideely heraus")}</h1>
     <ul class="pw-ben">
-      <li>${check}<span><b>Onbeperkt lezen</b> uit ${ALL.length} boeken, in 18 onderwerpen</span></li>
-      <li>${check}<span><b>Verdieping bij elk idee</b>: de redenering, voorbeelden en kanttekeningen</span></li>
-      <li>${check}<span><b>Elk boek of artikel toevoegen</b> en er direct een samenvatting van maken</span></li>
-      <li>${check}<span>Dagdoel, reeks, herinnering en widget blijven ook gratis</span></li>
+      <li>${check}<span>${T(`<b>Onbeperkt lezen</b> uit ${ALL.length} boeken, in 18 onderwerpen`,`<b>Unlimited reading</b> from ${ALL.length} books across 18 topics`,`<b>Unbegrenzt lesen</b> aus ${ALL.length} Büchern in 18 Themen`)}</span></li>
+      <li>${check}<span>${T("<b>Verdieping bij elk idee</b>: de redenering, voorbeelden en kanttekeningen","<b>A deep dive on every idea</b>: the reasoning, examples and caveats","<b>Vertiefung zu jeder Idee</b>: Begründung, Beispiele und Einwände")}</span></li>
+      <li>${check}<span>${T("<b>Elk boek of artikel toevoegen</b> en er direct een samenvatting van maken","<b>Add any book or article</b> and get a summary straight away","<b>Jedes Buch oder jeden Artikel hinzufügen</b> und sofort zusammenfassen lassen")}</span></li>
+      <li>${check}<span>${T("Dagdoel, reeks, herinnering en widget blijven ook gratis","Daily goal, streak, reminder and widget stay free","Tagesziel, Serie, Erinnerung und Widget bleiben kostenlos")}</span></li>
     </ul>
     <div class="plans">
-      <button class="plan" data-plan="ANNUAL" aria-pressed="${pwPick==="ANNUAL"}"><span><b>Jaar</b>${trial?'<span class="badge">7 dagen gratis</span>':'<span class="badge">Beste keus</span>'}</span><span class="pr">${yr?esc(yr.product.priceString):"–"}</span><small>${perMonth?`Omgerekend ${perMonth} per maand`:"Per jaar"}</small></button>
-      <button class="plan" data-plan="MONTHLY" aria-pressed="${pwPick==="MONTHLY"}"><span><b>Maand</b></span><span class="pr">${mo?esc(mo.product.priceString):"–"}</span><small>Maandelijks opzegbaar</small></button>
+      <button class="plan" data-plan="ANNUAL" aria-pressed="${pwPick==="ANNUAL"}"><span><b>${T("Jaar","Year","Jahr")}</b>${trial?`<span class="badge">${T("7 dagen gratis","7 days free","7 Tage gratis")}</span>`:`<span class="badge">${T("Beste keus","Best value","Beste Wahl")}</span>`}</span><span class="pr">${yr?esc(yr.product.priceString):"–"}</span><small>${perMonth?T(`Omgerekend ${perMonth} per maand`,`Works out at ${perMonth} a month`,`Umgerechnet ${perMonth} pro Monat`):T("Per jaar","Per year","Pro Jahr")}</small></button>
+      <button class="plan" data-plan="MONTHLY" aria-pressed="${pwPick==="MONTHLY"}"><span><b>${T("Maand","Month","Monat")}</b></span><span class="pr">${mo?esc(mo.product.priceString):"–"}</span><small>${T("Maandelijks opzegbaar","Cancel any month","Monatlich kündbar")}</small></button>
     </div></div>
     <div class="ob-foot">
-      <button class="btn wide" id="pwbuy" ${avail&&sel&&!pwBusy?"":"disabled"}>${pwBusy?"Bezig…":!avail?"Abonnementen zijn nog niet beschikbaar":pwPick==="ANNUAL"&&trial?"Probeer 7 dagen gratis":"Abonneer voor "+esc(sel?.product?.priceString||"")}</button>
-      <small>${pwPick==="ANNUAL"&&trial?"Daarna "+esc(yr?.product?.priceString||"")+" per jaar. ":""}Opzeggen kan altijd via je ${PLATFORM==="ios"?"App Store":"Google Play"}-account.</small>
-      <div class="pw-legal"><button id="pwrestore">Aankoop herstellen</button><a href="${SITE}/voorwaarden.html" target="_blank" rel="noopener">Voorwaarden</a><a href="${SITE}/privacy.html" target="_blank" rel="noopener">Privacy</a></div>
+      <button class="btn wide" id="pwbuy" ${avail&&sel&&!pwBusy?"":"disabled"}>${pwBusy?T("Bezig…","Working…","Einen Moment…"):!avail?T("Abonnementen zijn nog niet beschikbaar","Subscriptions aren't available yet","Abos sind noch nicht verfügbar"):pwPick==="ANNUAL"&&trial?T("Probeer 7 dagen gratis","Try 7 days free","7 Tage gratis testen"):T("Abonneer voor ","Subscribe for ","Abonnieren für ")+esc(sel?.product?.priceString||"")}</button>
+      <small>${pwPick==="ANNUAL"&&trial?T("Daarna ","Then ","Danach ")+esc(yr?.product?.priceString||"")+T(" per jaar. "," a year. "," pro Jahr. "):""}${T(`Opzeggen kan altijd via je ${store}-account.`,`Cancel any time in your ${store} account.`,`Kündigen jederzeit über dein ${store}-Konto.`)}</small>
+      <div class="pw-legal"><button id="pwrestore">${T("Aankoop herstellen","Restore purchase","Kauf wiederherstellen")}</button><a href="${SITE}/voorwaarden.html" target="_blank" rel="noopener">${T("Voorwaarden","Terms","Bedingungen")}</a><a href="${SITE}/privacy.html" target="_blank" rel="noopener">${T("Privacy","Privacy","Datenschutz")}</a></div>
     </div>`;
   document.getElementById("pwclose").onclick=closePaywall;
   PW.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{pwPick=b.dataset.plan;renderPaywall(reason)});
@@ -849,13 +990,13 @@ async function buy(reason){
   const P=PLUG("Purchases"),p=pkg(pwPick);if(!P||!p)return;
   pwBusy=true;renderPaywall(reason);
   try{const r=await P.purchasePackage({aPackage:p});const ok=!!r?.customerInfo?.entitlements?.active?.[RC_ENTITLEMENT];setPremium(ok);
-    pwBusy=false;if(ok){const b=pwAfter;closePaywall();toast("Welkom bij Premium");if(b)openReader(b.id)}else renderPaywall(reason)}
-  catch(e){pwBusy=false;renderPaywall(reason);if(!e?.userCancelled&&e?.code!=="1")toast("De aankoop is niet gelukt. Probeer het opnieuw.")}
+    pwBusy=false;if(ok){const b=pwAfter;closePaywall();toast(T("Welkom bij Premium","Welcome to Premium","Willkommen bei Premium"));if(b)openReader(b.id)}else renderPaywall(reason)}
+  catch(e){pwBusy=false;renderPaywall(reason);if(!e?.userCancelled&&e?.code!=="1")toast(T("De aankoop is niet gelukt. Probeer het opnieuw.","The purchase didn't go through. Please try again.","Der Kauf hat nicht geklappt. Bitte versuch es erneut."))}
 }
 async function restore(){
   const P=PLUG("Purchases");if(!P)return;
   try{const r=await P.restorePurchases();const ok=!!r?.customerInfo?.entitlements?.active?.[RC_ENTITLEMENT];setPremium(ok);
-    toast(ok?"Je Premium-abonnement is hersteld":"Geen actief abonnement gevonden");if(ok)closePaywall()}catch{toast("Herstellen lukte niet")}
+    toast(ok?T("Je Premium-abonnement is hersteld","Your Premium subscription has been restored","Dein Premium-Abo wurde wiederhergestellt"):T("Geen actief abonnement gevonden","No active subscription found","Kein aktives Abo gefunden"));if(ok)closePaywall()}catch{toast(T("Herstellen lukte niet","Couldn't restore","Wiederherstellen fehlgeschlagen"))}
 }
 
 /* Idee van de dag: voor widget en herinnering */
@@ -863,17 +1004,27 @@ function ideaOfDay(){
   const t=dayKey();let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;
   const busy=[...ALL,...S.books].find(b=>{const p=prog(b);return b.ideas.length&&p>0&&p<b.ideas.length});
   if(busy){const it=busy.ideas[prog(busy)];return {title:it.title,body:it.body,book:busy.titleNl||busy.title,id:busy.id}}
-  const recs=recommended(5).filter(b=>b.ideas.length);const pool=recs.length?recs:CATALOG;
+  const recs=recommended(8).filter(b=>b.ideas.length);const pool=recs.length?recs:ALL.filter(b=>b.ideas.length);
+  if(!pool.length)return {title:T("Je ideeën van vandaag staan klaar","Today's ideas are ready","Deine Ideen für heute sind bereit"),body:T("Open Ideely en lees een paar kernideeën.","Open Ideely and read a few key ideas.","Öffne Ideely und lies ein paar Kernideen."),book:"Ideely",id:null};
   const b=pool[h%pool.length],it=b.ideas[0];return {title:it.title,body:it.body,book:b.titleNl||b.title,id:b.id};
 }
 async function updateWidget(){
   if(!NATIVE)return;const Pref=PLUG("Preferences");if(!Pref)return;
   const i=ideaOfDay();rollDay();
   const data={title:i.title,body:i.body.length>220?i.body.slice(0,217).replace(/\s+\S*$/,"")+"…":i.body,book:i.book,day:dayKey(),
-    goal:`${Math.min(S.prof.count,S.prof.goal)}/${S.prof.goal} vandaag`,streak:S.prof.streak||0};
+    goal:`${Math.min(S.prof.count,S.prof.goal)}/${S.prof.goal}`+T(" vandaag"," today"," heute"),streak:S.prof.streak||0};
   try{await Pref.set({key:"widget",value:JSON.stringify(data)});await PLUG("WidgetBridge")?.update()}catch{}
 }
-const REMINDER_TEXTS=["Je dagelijkse ideeën staan klaar","Vijf minuten voor een nieuw inzicht?","Houd je reeks vast","Tijd voor een paar kernideeën","Vandaag al iets nieuws geleerd?"];
+const REMINDER_TEXTS=T(["Je dagelijkse ideeën staan klaar","Vijf minuten voor een nieuw inzicht?","Houd je reeks vast","Tijd voor een paar kernideeën","Vandaag al iets nieuws geleerd?"],
+  ["Your daily ideas are ready","Five minutes for a new insight?","Keep your streak going","Time for a few key ideas","Learned something new today?"],
+  ["Deine täglichen Ideen sind bereit","Fünf Minuten für eine neue Erkenntnis?","Halte deine Serie","Zeit für ein paar Kernideen","Heute schon etwas Neues gelernt?"]);
+/* Herinneringen voor 14 dagen vooruit. Elke derde dag het idee van de dag, de dag erna een boek dat past bij wat je leest. */
+function bookTip(k){
+  const bc=becauseRead(6);
+  if(bc){const b=bc.books[k%bc.books.length],f=bc.from.titleNl||bc.from.title;
+    return {title:T(`Omdat je ${f} las`,`Because you read ${f}`,`Weil du ${f} gelesen hast`),body:T(`Probeer ${b.titleNl||b.title} van ${b.author}: de kernideeën in vijf minuten.`,`Try ${b.titleNl||b.title} by ${b.author}: the key ideas in five minutes.`,`Probier ${b.titleNl||b.title} von ${b.author}: die Kernideen in fünf Minuten.`),id:b.id}}
+  const r=recommended(6);if(!r.length)return null;const b=r[k%r.length];
+  return {title:T("Een boek voor jou","A book for you","Ein Buch für dich"),body:`${b.titleNl||b.title} · ${b.author}`+(whyFor(b)?` · ${whyFor(b)}`:""),id:b.id}}
 async function scheduleReminders(){
   if(!NATIVE)return;const L=PLUG("LocalNotifications");if(!L)return;
   try{
@@ -884,9 +1035,11 @@ async function scheduleReminders(){
     const [hh,mm]=r.time.split(":").map(Number);rollDay();const i=ideaOfDay();
     const list=[];for(let k=0;k<14;k++){const at=new Date();at.setDate(at.getDate()+k);at.setHours(hh,mm,0,0);
       if(at<=new Date())continue;if(k===0&&S.prof.count>=S.prof.goal)continue;
-      list.push({id:100+k,title:k===0||k%3===0?i.title:REMINDER_TEXTS[k%REMINDER_TEXTS.length],
-        body:k===0||k%3===0?`Idee van de dag uit ${i.book}`:(S.prof.streak?`Je reeks staat op ${S.prof.streak} ${S.prof.streak===1?"dag":"dagen"}.`:"Open de app voor je ideeën van vandaag."),
-        schedule:{at,allowWhileIdle:true}})}
+      let n;
+      if(k%3===0)n={title:i.title,body:T("Idee van de dag uit ","Idea of the day from ","Idee des Tages aus ")+i.book,id:i.id};
+      else if(k%3===1)n=bookTip(k);
+      if(!n)n={title:REMINDER_TEXTS[k%REMINDER_TEXTS.length],body:S.prof.streak?streakTxt(S.prof.streak)+".":T("Open de app voor je ideeën van vandaag.","Open the app for today's ideas.","Öffne die App für deine Ideen von heute."),id:null};
+      list.push({id:100+k,title:n.title,body:n.body,extra:n.id?{open:n.id}:{},schedule:{at,allowWhileIdle:true}})}
     if(list.length)await L.schedule({notifications:list});
   }catch(e){}
 }
@@ -898,11 +1051,14 @@ function initNative(){
     if(!PW.hidden){closePaywall();return}
     if(!R.hidden){closeReader();return}
     if(!OB.hidden&&S.prof.onboarded){OB.hidden=true;return}
+    if(!OB.hidden&&obIntro>0){obIntro--;renderOb();return}
     if(tab!=="home"){tab="home";render();return}
     A.exitApp?.();
   });
   A?.addListener("appStateChange",st=>{if(st.isActive){render();updateWidget()}else{updateWidget();scheduleReminders()}});
-  PLUG("LocalNotifications")?.addListener?.("localNotificationActionPerformed",()=>{tab="home";render()});
+  /* Tik op een melding: open het boek waar de melding over gaat */
+  PLUG("LocalNotifications")?.addListener?.("localNotificationActionPerformed",e=>{tab="home";render();
+    const id=e?.notification?.extra?.open;if(id&&findBook(id)&&S.prof.onboarded)setTimeout(()=>{if(R.hidden)openReader(id)},350)});
 }
 
 let toastT;function toast(m){const el=document.getElementById("toast");el.textContent=m;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,2600)}

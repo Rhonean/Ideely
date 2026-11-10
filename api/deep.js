@@ -1,29 +1,31 @@
 // Ideely — gedeelde verdieping per idee van een catalogusboek.
 import { cors, limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
 import { LIST, HANDWRITTEN } from "./_lib/books.js";
-import { deepPrompt } from "./_lib/prompts.js";
+import { deepPrompt, langOf } from "./_lib/prompts.js";
 export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
   const id = String(req.query?.id || ""), i = parseInt(req.query?.i, 10);
   if (!(i >= 0 && i < 20)) return res.status(400).json({ error: "invalid_request" });
-  const key = `${id}_${i}`;
+  const lang = langOf(String(req.query?.lang || "nl"));
+  const sid = lang === "nl" ? id : `${id}@${lang}`;
+  const key = `${sid}_${i}`;
 
   const hit = await storeGet("deep", "key", key);
   if (hit) { startText(res); res.setHeader("x-cache", "hit"); return res.end(hit.text); }
 
-  let book = HANDWRITTEN[id] || null;
-  if (!book && LIST[id]) {
-    const s = await storeGet("summaries", "id", id);
-    if (s?.data?.ideas) book = { ...LIST[id], ideas: s.data.ideas };
+  let book = lang === "nl" ? HANDWRITTEN[id] || null : null;
+  if (!book && (LIST[id] || HANDWRITTEN[id])) {
+    const s = await storeGet("summaries", "id", sid);
+    if (s?.data?.ideas) book = { ...(LIST[id] || HANDWRITTEN[id]), ideas: s.data.ideas };
   }
   const it = book?.ideas?.[i];
   if (!it) return res.status(404).json({ error: "not_found" });
 
   if (!sameOrigin(req)) return res.status(403).json({ error: "forbidden" });
   if (limited(req)) return res.status(429).json({ error: "rate_limited" });
-  const up = await anthropicStream(deepPrompt(book, it), { tier: "default", maxTokens: 1500 });
+  const up = await anthropicStream(deepPrompt(book, it, lang), { tier: "default", maxTokens: 1500 });
   if (!up.ok) return res.status(up.status).json({ error: up.error, message: up.message || "" });
   startText(res);
   const r = await pump(up.reader, t => res.write(t));

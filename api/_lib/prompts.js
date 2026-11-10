@@ -1,11 +1,15 @@
 // Vaste prompts (op de server, zodat niemand de gedeelde opslag kan vervuilen).
 export const KNOWLEDGE = ["Wetenschap", "Natuur", "Geschiedenis", "Politiek", "Economie", "Technologie", "Filosofie"];
+// Talen van de app. nl is de standaard; en en de krijgen een eigen, gedeelde samenvatting.
+export const LANGS = { nl: "het Nederlands", en: "het Engels", de: "het Duits" };
+export const langOf = q => (LANGS[q] ? q : "nl");
+const LOCAL_TITLE = { nl: "bekende Nederlandse titel of null", en: "bekende Engelse titel als die afwijkt van de oorspronkelijke, anders null", de: "bekende Duitse titel of null" };
 
-export function summaryPrompt(b) {
+export function summaryPrompt(b, lang = "nl") {
   const know = KNOWLEDGE.includes(b.topic);
-  return `Je maakt een samenvatting voor een leesapp met korte kernideeën: de kernideeën van één bestaand boek, in je eigen woorden, in het Nederlands.
+  return `Je maakt een samenvatting voor een leesapp met korte kernideeën: de kernideeën van één bestaand boek, in je eigen woorden, in ${LANGS[lang]}.
 
-Boek: "${b.title}" van ${b.author}${b.year ? ` (${b.year < 0 ? -b.year + " v.Chr." : b.year})` : ""}. Onderwerp in de app: ${b.topic}.
+Boek: "${b.title}" van ${b.author}${b.year ? ` (${b.year < 0 ? -b.year + " v.Chr." : b.year})` : ""}. ${b.topic ? `Onderwerp in de app: ${b.topic}.` : ""}
 
 Regels:
 1. Ken je dit boek niet goed genoeg om de inhoud betrouwbaar weer te geven? Geef dan alleen {"known":false,"reason":"..."}. Verzin nooit inhoud.
@@ -16,17 +20,18 @@ Regels:
 6. Precies 8 ideeën. Elk idee: titel van max. 8 woorden, tekst van 60 tot 90 woorden die op zichzelf te begrijpen is, en "apply": ${know ? "één of twee zinnen met een vraag of gedachte om over na te denken, die het idee verbindt met de wereld van vandaag of het leven van de lezer (max. 30 woorden)" : "één of twee zinnen met een concrete actie of reflectievraag voor de lezer (max. 30 woorden)"}.
 
 Antwoord in JSON Lines: één JSON-object per regel, zonder andere tekst, zonder codeblok.
-Regel 1: {"known":true,"titleNl":"bekende Nederlandse titel of null","summary":"twee zinnen waar het boek over gaat"}
-Regel 2 tot en met 9: {"title":"...","body":"...","apply":"..."}`;
+Regel 1: {"known":true,"titleNl":"${LOCAL_TITLE[lang]}","summary":"twee zinnen waar het boek over gaat"}
+Regel 2 tot en met 9: {"title":"...","body":"...","apply":"..."}
+Schrijf alle tekst (summary, title, body, apply) in ${LANGS[lang]}.`;
 }
 
-export function deepPrompt(b, it) {
+export function deepPrompt(b, it, lang = "nl") {
   return `Je schrijft een verdieping bij één idee uit het boek "${b.title}" van ${b.author || "onbekende auteur"}, voor een leesapp met korte kernideeën. De lezer heeft deze korte kaart al gelezen:
 
 Titel: ${it.title}
 Tekst: ${it.body}
 
-Schrijf in het Nederlands een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
+Schrijf in ${LANGS[lang]} een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
 - Leg de redenering of het mechanisme achter het idee uit zoals de auteur het onderbouwt. Herhaal de kaart niet.
 - Noem een voorbeeld, onderzoek of anekdote uit het boek alleen als je zeker weet dat die er echt in staat. Verzin geen cijfers, namen of citaten; twijfel je, laat het dan weg.
 - Geef een kanttekening of beperking als die relevant is, bijvoorbeeld kritiek op het idee.

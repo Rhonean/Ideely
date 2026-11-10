@@ -2,17 +2,20 @@
 // Bestaat hij al in de opslag, dan komt hij direct terug (JSON). Anders wordt hij
 // één keer geschreven (gestreamd als JSON Lines) en daarna voor iedereen bewaard.
 import { cors, limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
-import { LIST } from "./_lib/books.js";
-import { summaryPrompt, parseSummary } from "./_lib/prompts.js";
+import { LIST, HANDWRITTEN } from "./_lib/books.js";
+import { summaryPrompt, parseSummary, langOf } from "./_lib/prompts.js";
 export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
   const id = String(req.query?.id || "");
-  const book = LIST[id];
+  const lang = langOf(String(req.query?.lang || "nl"));
+  // Handgeschreven boeken zijn Nederlands; in een andere taal worden ze net als de rest één keer gemaakt.
+  const book = LIST[id] || (lang !== "nl" ? HANDWRITTEN[id] : null);
   if (!book) return res.status(404).json({ error: "not_found" });
+  const key = lang === "nl" ? id : `${id}@${lang}`;
 
-  const hit = await storeGet("summaries", "id", id);
+  const hit = await storeGet("summaries", "id", key);
   if (hit) {
     res.setHeader("cache-control", "public, max-age=300");
     return res.status(200).json({ cached: true, data: hit.data });
@@ -22,7 +25,7 @@ export default async function handler(req, res) {
 
   // warm=1: op de achtergrond klaarzetten, zonder te streamen; antwoord is JSON.
   const warm = req.query?.warm === "1";
-  const up = await anthropicStream(summaryPrompt(book), { tier: "default", maxTokens: 3500 });
+  const up = await anthropicStream(summaryPrompt(book, lang), { tier: "default", maxTokens: 3500 });
   if (!up.ok) return res.status(up.status).json({ error: up.error, message: up.message || "" });
   if (!warm) startText(res);
   const r = await pump(up.reader, t => { if (!warm) res.write(t); });
@@ -39,7 +42,7 @@ export default async function handler(req, res) {
     summary: String(meta.summary || ""),
     ideas,
   };
-  if (data) await storePut("summaries", { id, data });
+  if (data) await storePut("summaries", { id: key, data });
   if (warm) return data ? res.status(200).json({ cached: false, data }) : res.status(502).json({ error: "upstream_error" });
   if (r.stop === "max_tokens") res.write("\u0000TRUNC");
   res.end();
