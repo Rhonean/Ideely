@@ -221,7 +221,7 @@ textarea{min-height:130px;resize:vertical}
 <script>
 /* In de app op de telefoon staat de server elders dan de pagina */
 const NATIVE=!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
-const SITE="https://ideeenstash.vercel.app";
+const SITE="https://ideely.vercel.app";
 const API=NATIVE?SITE:"";
 const CATALOG=JSON.parse(document.getElementById("catalog").textContent).map(b=>({...b,catalog:true,ideas:b.ideas.map(([title,body,apply])=>({title,body,apply}))}));
 const TOPICS=["Mindset","Productiviteit","Psychologie","Geld","Gezondheid","Energie","Leiderschap","Relaties","Filosofie","Communicatie","Gewoontes","Ondernemen","Wetenschap","Natuur","Geschiedenis","Politiek","Economie","Technologie"];
