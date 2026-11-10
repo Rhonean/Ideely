@@ -170,6 +170,16 @@ textarea{min-height:130px;resize:vertical}
 .slide .deep .dk{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;opacity:.8;margin-bottom:8px}
 .slide .deep p{font-size:1.02rem}
 .slide .buy{margin:6px 0 14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.stats b{display:block;font-family:var(--f-display);font-size:1.3rem;line-height:1.1}
+.stats span{font-size:.78rem;color:var(--muted)}
+.iotd{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;border:0;margin-top:14px;background:var(--tc);color:var(--card-ink);border-radius:20px;padding:18px;box-shadow:0 12px 28px -16px rgba(0,0,0,.45)}
+.iotd .kicker{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;opacity:.8}
+.iotd .t{font-family:var(--f-display);font-weight:700;font-size:1.3rem;line-height:1.15}
+.iotd .b{font-family:var(--f-read);font-size:.97rem;line-height:1.5;opacity:.95}
+.iotd .go{font-weight:700;font-size:.9rem;margin-top:4px}
+.lede.sub{margin:-6px 0 8px;font-size:.88rem}
 .gains{display:flex;flex-direction:column;gap:10px}
 .gain{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
 .gain .gh{display:flex;align-items:center;gap:10px;margin-bottom:6px}
@@ -434,18 +444,35 @@ function renderHome(){
   const own=S.books.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   const done=all.filter(finished);
   const left=Math.max(S.prof.goal-S.prof.count,0);
+  const iod=ideaOfDay();
+  const w=topicWeights(),read=new Set(S.prof.read||[]),shown=new Set([...recs,...(because?because.books:[])].map(b=>b.id));
+  /* bekende (handgeschreven) boeken buiten je onderwerpen, elke dag een andere selectie */
+  const wider=CATALOG.filter(b=>!w[b.topic]&&!read.has(b.id)&&!shown.has(b.id)&&prog(b)===0&&!b.unknown).sort((a,b)=>dayRnd(a.id)-dayRnd(b.id)).slice(0,10);
+  const mine=TOPICS.filter(t=>w[t]),other=TOPICS.filter(t=>!w[t]);
+  const stat=(n,l)=>`<div><b>${n}</b><span>${l}</span></div>`;
   main.innerHTML=`
   <div class="today">${ring()}<div><b>${left?T(`Nog ${nIdeas(left)} voor vandaag`,`${nIdeas(left)} to go today`,`Noch ${nIdeas(left)} für heute`):T("Dagdoel gehaald","Daily goal reached","Tagesziel erreicht")}</b>
     <small>${busy.length?T("Ga verder waar je gebleven was.","Pick up where you left off.","Mach weiter, wo du aufgehört hast."):recs.length?T("Begin met een aanbeveling hieronder.","Start with a recommendation below.","Beginne mit einer Empfehlung unten."):T("Zoek een boek via Ontdek.","Find a book in Discover.","Finde ein Buch unter Entdecken.")}</small></div></div>
+  <div class="stats">${stat(S.prof.streak||0,T("dagen reeks","day streak","Tage Serie"))}${stat(done.length,T("boeken uit","books finished","Bücher fertig"))}${stat(S.saved.length,T("bewaard","saved","gespeichert"))}</div>
+  ${iod.id?`<button class="iotd" style="--tc:${topicColor(iod.topic)}" data-iod="${esc(iod.id)}|${iod.i}">
+    <span class="kicker">${T("Idee van de dag","Idea of the day","Idee des Tages")} · ${esc(iod.book)}</span>
+    <span class="t">${esc(iod.title)}</span>
+    <span class="b">${esc(iod.body.length>190?iod.body.slice(0,187).replace(/\s+\S*$/,"")+"…":iod.body)}</span>
+    <span class="go">${T("Lees verder →","Read on →","Weiterlesen →")}</span></button>`:""}
   ${busy.length?`<h2>${T("Verder lezen","Continue reading","Weiterlesen")}</h2><div class="rail">${busy.map(b=>bookCard(b)).join("")}</div>`:""}
   <div class="h2row"><h2>${T("Aanbevolen voor jou","Recommended for you","Für dich empfohlen")}</h2><button id="edit">${T("Profiel aanpassen","Edit profile","Profil bearbeiten")}</button></div>
   ${recs.length?`<div class="rail">${recs.map(b=>bookCard(b,{why:true})).join("")}</div>`:`<div class="empty">${T("Je hebt alle aanbevolen boeken gelezen. Laat hieronder nieuwe boeken voorstellen.","You've read all recommended books. Ask for new suggestions below.","Du hast alle empfohlenen Bücher gelesen. Lass dir unten neue vorschlagen.")}</div>`}
   ${because?`<h2>${esc(T(`Omdat je ${because.from.titleNl||because.from.title} las`,`Because you read ${because.from.titleNl||because.from.title}`,`Weil du ${because.from.titleNl||because.from.title} gelesen hast`))}</h2><div class="rail">${because.books.map(b=>bookCard(b)).join("")}</div>`:""}
+  ${wider.length?`<h2>${T("Ook de moeite waard","Also worth reading","Auch lesenswert")}</h2><p class="lede sub">${T("Bekende boeken buiten je eigen onderwerpen.","Well-known books outside your own topics.","Bekannte Bücher außerhalb deiner Themen.")}</p><div class="rail">${wider.map(b=>bookCard(b)).join("")}</div>`:""}
+  <h2>${T("Ontdek een onderwerp","Explore a topic","Thema entdecken")}</h2>
+  <div class="chips">${[...mine,...other].map(t=>`<button class="chip" data-topic="${t}" ${w[t]?'aria-pressed="true"':""}>${esc(tn(t))}</button>`).join("")}</div>
   ${aiBlock("home")}
   ${own.length?`<h2>${T("Zelf toegevoegd","Added by you","Selbst hinzugefügt")}</h2><div class="shelf">${own.map(b=>bookCard(b)).join("")}</div>`:""}
   ${done.length?`<h2>${T("Uitgelezen","Finished","Ausgelesen")}</h2><div class="shelf">${done.map(b=>bookCard(b)).join("")}</div>`:""}`;
   document.getElementById("edit").onclick=()=>openOnboarding(true);
-  schedulePrefetch([...busy,...recs]);
+  main.querySelectorAll("[data-iod]").forEach(el=>el.onclick=()=>{const[id,i]=el.dataset.iod.split("|");openReader(id,+i+1)});
+  main.querySelectorAll("[data-topic]").forEach(el=>el.onclick=()=>{aiTopic=el.dataset.topic;tab="ontdek";render();main.scrollTop=0});
+  schedulePrefetch([...busy,...recs,...wider.slice(0,2)]);
   bindOpen();bindAi();
 }
 function setLang(l){if(!LANGS.includes(l)||l===LANG)return;S.prof.lang=l;lsSet();location.reload()}
@@ -1054,10 +1081,10 @@ async function restore(){
 function ideaOfDay(){
   const t=dayKey();let h=0;for(const c of t)h=(h*31+c.charCodeAt(0))>>>0;
   const busy=[...ALL,...S.books].find(b=>{const p=prog(b);return b.ideas.length&&p>0&&p<b.ideas.length});
-  if(busy){const it=busy.ideas[prog(busy)];return {title:it.title,body:it.body,book:busy.titleNl||busy.title,id:busy.id}}
+  if(busy){const it=busy.ideas[prog(busy)];return {title:it.title,body:it.body,book:busy.titleNl||busy.title,id:busy.id,i:prog(busy),topic:busy.topic}}
   const recs=recommended(8).filter(b=>b.ideas.length);const pool=recs.length?recs:ALL.filter(b=>b.ideas.length);
   if(!pool.length)return {title:T("Je ideeën van vandaag staan klaar","Today's ideas are ready","Deine Ideen für heute sind bereit"),body:T("Open Ideely en lees een paar kernideeën.","Open Ideely and read a few key ideas.","Öffne Ideely und lies ein paar Kernideen."),book:"Ideely",id:null};
-  const b=pool[h%pool.length],it=b.ideas[0];return {title:it.title,body:it.body,book:b.titleNl||b.title,id:b.id};
+  const b=pool[h%pool.length],it=b.ideas[0];return {title:it.title,body:it.body,book:b.titleNl||b.title,id:b.id,i:0,topic:b.topic};
 }
 async function updateWidget(){
   if(!NATIVE)return;const Pref=PLUG("Preferences");if(!Pref)return;
