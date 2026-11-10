@@ -342,7 +342,7 @@ function lsSet(){try{localStorage.setItem("ideely",JSON.stringify({books:LOCAL?S
 async function initStore(){
   for(const b of ALL)if(b.lazy)applyShared(b,S.shared[SK(b.id)]);
   storeReady=true;render();
-  if(!S.prof.onboarded)openOnboarding();
+  if(!S.prof.onboarded)openOnboarding();else if(!S.prof.introSeen)openIntro();
 }
 async function putBook(b){if(LOCAL){S.books=[b,...S.books.filter(x=>x.id!==b.id)];lsSet();render();return}const{id,live,...rest}=b;await base.collection("books").doc(id).set(rest)}
 async function delBook(id){if(LOCAL){S.books=S.books.filter(x=>x.id!==id);lsSet();render();return}await base.collection("books").doc(id).delete()}
@@ -458,6 +458,7 @@ function closeMenu(){MENU.hidden=true;MENU.innerHTML=""}
 function renderMenu(){
   MENU.innerHTML=`<div class="menu-in" role="dialog" aria-label="Menu">
     <button class="mrow" id="m-prof">${IC.user}<span>${T("Profiel aanpassen","Edit profile","Profil bearbeiten")}</span></button>
+    <button class="mrow" id="m-intro">${IC.spark}<span>${T("Wat is Ideely?","What is Ideely?","Was ist Ideely?")}</span></button>
     <div class="setrow"><b>${T("Taal","Language","Sprache")}</b>${seg("lang",LANG,[["nl","Nederlands"],["en","English"],["de","Deutsch"]])}</div>
     <div class="setrow"><b>${T("Weergave","Appearance","Darstellung")}</b>${seg("theme",S.prof.theme||"light",[["light",T("Licht","Light","Hell")],["dark",T("Donker","Dark","Dunkel")],["system",T("Als telefoon","Like phone","Wie Handy")]])}</div>
     <div class="setrow"><b>${T("Back-up","Backup","Backup")}</b><small>${T("Je voortgang staat op dit toestel. Met een back-up zet je hem over naar een ander toestel.","Your progress is stored on this device. A backup lets you move it to another device.","Dein Fortschritt ist auf diesem Gerät gespeichert. Mit einem Backup überträgst du ihn auf ein anderes Gerät.")}</small>
@@ -466,6 +467,7 @@ function renderMenu(){
   </div>`;
   MENU.onclick=e=>{if(e.target===MENU)closeMenu()};
   document.getElementById("m-prof").onclick=()=>{closeMenu();openOnboarding(true)};
+  document.getElementById("m-intro").onclick=()=>{closeMenu();openIntro()};
   MENU.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
   MENU.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>{S.prof.theme=b.dataset.theme;document.documentElement.dataset.theme=S.prof.theme;profChanged();renderMenu()});
   document.getElementById("bk-save").onclick=()=>{saveBackup();closeMenu()};
@@ -489,7 +491,10 @@ function renderSaved(){
    Onderwerpen worden afgeleid van je doelen; je ziet en verfijnt ze pas in de laatste stap. */
 const OB=document.getElementById("ob");let obStep=0,obDraft=null,obEdit=false,obIntro=-1;
 const deriveTopics=goals=>[...new Set(goals.flatMap(g=>GOALS.find(x=>x.id===g)?.topics||[]))];
-function openOnboarding(edit){obEdit=!!edit&&S.prof.onboarded;obStep=0;obIntro=obEdit||S.prof.introSeen?-1:0;
+/* Alleen het welkom: voor wie al een profiel heeft (na een update, of via het menu) */
+let introOnly=false;
+function openIntro(){introOnly=true;S.prof.introSeen=true;profChanged();obEdit=false;obIntro=0;OB.hidden=false;renderOb()}
+function openOnboarding(edit){introOnly=false;obEdit=!!edit&&S.prof.onboarded;obStep=0;obIntro=obEdit||S.prof.introSeen?-1:0;
   obDraft={goals:[...(S.prof.goals||[])],topics:[...(S.prof.topics||[])],custom:!!S.prof.topicsCustom,goal:S.prof.goal||5,read:[...(S.prof.read||[])],reminder:{...(S.prof.reminder||{on:true,time:"08:00"})}};
   OB.hidden=false;renderOb()}
 function renderIntro(){
@@ -529,11 +534,12 @@ function renderIntro(){
       ${feat("user",T("Afgestemd op jou","Tailored to you","Auf dich abgestimmt"),T("Vertel in een minuut wat je wilt bereiken. Ideely kiest de boeken en leert van wat je leest.","Tell us in a minute what you want to achieve. Ideely picks the books and learns from what you read.","Erzähl in einer Minute, was du erreichen willst. Ideely wählt die Bücher und lernt aus dem, was du liest."))}
     </ul>`;
   OB.innerHTML=`<div class="ob-in intro"><div class="ob-top">${i>0?`<button id="ibk">${T("← Terug","← Back","← Zurück")}</button>`:""}<div class="dots">${[0,1,2].map(k=>`<i class="${k===i?"on":""}"></i>`).join("")}</div><div class="minilang" role="group" aria-label="Taal · Language · Sprache">${LANGS.map(k=>`<button data-lang="${k}" aria-pressed="${k===LANG}">${k.toUpperCase()}</button>`).join("")}</div></div>${body}</div>
-    <div class="ob-foot"><button class="btn wide" id="inext">${last?T("Stel mijn profiel samen","Set up my profile","Mein Profil einrichten"):T("Volgende","Next","Weiter")}</button>${last?`<small>${T("Duurt ongeveer een minuut","Takes about a minute","Dauert etwa eine Minute")}</small>`:`<button class="skip" id="iskip">${T("Overslaan","Skip","Überspringen")}</button>`}</div>`;
+    <div class="ob-foot"><button class="btn wide" id="inext">${last?(introOnly?T("Aan de slag","Let's go","Los geht's"):T("Stel mijn profiel samen","Set up my profile","Mein Profil einrichten")):T("Volgende","Next","Weiter")}</button>${last?(introOnly?"":`<small>${T("Duurt ongeveer een minuut","Takes about a minute","Dauert etwa eine Minute")}</small>`):`<button class="skip" id="iskip">${T("Overslaan","Skip","Überspringen")}</button>`}</div>`;
   OB.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
   const bk=document.getElementById("ibk");if(bk)bk.onclick=()=>{obIntro--;renderOb()};
   const sk=document.getElementById("iskip");if(sk)sk.onclick=()=>{obIntro=2;renderOb()};
-  document.getElementById("inext").onclick=()=>{if(last){obIntro=-1;obStep=0;S.prof.introSeen=true;lsSet()}else obIntro++;OB.querySelector(".ob-in").scrollTop=0;renderOb()};
+  document.getElementById("inext").onclick=()=>{if(last&&introOnly){S.prof.introSeen=true;profChanged();OB.hidden=true;obIntro=-1;return}
+    if(last){obIntro=-1;obStep=0;S.prof.introSeen=true;lsSet()}else obIntro++;OB.querySelector(".ob-in").scrollTop=0;renderOb()};
 }
 function renderOb(){
   if(obIntro>=0)return renderIntro();
