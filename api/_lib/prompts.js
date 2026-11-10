@@ -1,9 +1,9 @@
 // Vaste prompts (op de server, zodat niemand de gedeelde opslag kan vervuilen).
 export const KNOWLEDGE = ["Wetenschap", "Natuur", "Geschiedenis", "Politiek", "Economie", "Technologie", "Filosofie"];
 
-export function stashPrompt(b) {
+export function summaryPrompt(b) {
   const know = KNOWLEDGE.includes(b.topic);
-  return `Je maakt een "stash" voor een leesapp zoals Deepstash: de kernideeën van één bestaand boek, in je eigen woorden, in het Nederlands.
+  return `Je maakt een samenvatting voor een leesapp met korte kernideeën: de kernideeën van één bestaand boek, in je eigen woorden, in het Nederlands.
 
 Boek: "${b.title}" van ${b.author}${b.year ? ` (${b.year < 0 ? -b.year + " v.Chr." : b.year})` : ""}. Onderwerp in de app: ${b.topic}.
 
@@ -21,7 +21,7 @@ Regel 2 tot en met 9: {"title":"...","body":"...","apply":"..."}`;
 }
 
 export function deepPrompt(b, it) {
-  return `Je schrijft een verdieping bij één idee uit het boek "${b.title}" van ${b.author || "onbekende auteur"}, voor een leesapp zoals Deepstash. De lezer heeft deze korte kaart al gelezen:
+  return `Je schrijft een verdieping bij één idee uit het boek "${b.title}" van ${b.author || "onbekende auteur"}, voor een leesapp met korte kernideeën. De lezer heeft deze korte kaart al gelezen:
 
 Titel: ${it.title}
 Tekst: ${it.body}
@@ -34,8 +34,8 @@ Schrijf in het Nederlands een verdieping van 200 tot 300 woorden, in 3 of 4 kort
 Platte tekst, alinea's gescheiden door een lege regel, geen kopjes, geen opsommingstekens, geen markdown.`;
 }
 
-// Zet de JSON Lines-uitvoer om naar een stash-object.
-export function parseStash(text) {
+// Zet de JSON Lines-uitvoer om naar een samenvatting.
+export function parseSummary(text) {
   let meta = null; const ideas = [];
   for (let line of text.split("\n")) {
     line = line.trim().replace(/^```(json)?|```$/g, "").trim();

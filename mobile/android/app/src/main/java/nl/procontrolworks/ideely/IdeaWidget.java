@@ -1,4 +1,4 @@
-package nl.procontrolworks.ideeenstash;
+package nl.procontrolworks.ideely;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -23,7 +23,7 @@ public class IdeaWidget extends AppWidgetProvider {
     static void render(Context ctx, AppWidgetManager mgr, int id) {
         RemoteViews v = new RemoteViews(ctx.getPackageName(), R.layout.widget_idea);
         String title = "Je idee van vandaag";
-        String body = "Open Ideeënstash om je eerste stash te lezen.";
+        String body = "Open Ideely om je eerste ideeën te lezen.";
         String book = "Idee van de dag";
         String meta = "";
         try {

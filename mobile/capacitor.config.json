@@ -1,6 +1,6 @@
 {
-  "appId": "nl.procontrolworks.ideeenstash",
-  "appName": "Ideeënstash",
+  "appId": "nl.procontrolworks.ideely",
+  "appName": "Ideely",
   "webDir": "www",
   "backgroundColor": "#eef0ec",
   "android": {

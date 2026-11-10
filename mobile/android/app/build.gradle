@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "nl.procontrolworks.ideeenstash"
+    namespace = "nl.procontrolworks.ideely"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "nl.procontrolworks.ideeenstash"
+        applicationId "nl.procontrolworks.ideely"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -21,9 +21,9 @@ android {
     signingConfigs {
         test {
             storeFile file("test.keystore")
-            storePassword "ideeenstash-test"
+            storePassword "ideely-test"
             keyAlias "test"
-            keyPassword "ideeenstash-test"
+            keyPassword "ideely-test"
         }
     }
     buildTypes {

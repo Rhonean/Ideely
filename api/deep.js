@@ -1,4 +1,4 @@
-// Ideeënstash — gedeelde verdieping per idee van een catalogusboek.
+// Ideely — gedeelde verdieping per idee van een catalogusboek.
 import { cors, limited, sameOrigin, anthropicStream, pump, storeGet, storePut, startText } from "./_lib/common.js";
 import { LIST, HANDWRITTEN } from "./_lib/books.js";
 import { deepPrompt } from "./_lib/prompts.js";
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   let book = HANDWRITTEN[id] || null;
   if (!book && LIST[id]) {
-    const s = await storeGet("stashes", "id", id);
+    const s = await storeGet("summaries", "id", id);
     if (s?.data?.ideas) book = { ...LIST[id], ideas: s.data.ideas };
   }
   const it = book?.ideas?.[i];

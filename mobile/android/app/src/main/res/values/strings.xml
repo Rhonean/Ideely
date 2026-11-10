@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Ideeënstash</string>
-    <string name="title_activity_main">Ideeënstash</string>
-    <string name="package_name">nl.procontrolworks.ideeenstash</string>
-    <string name="custom_url_scheme">nl.procontrolworks.ideeenstash</string>
+    <string name="app_name">Ideely</string>
+    <string name="title_activity_main">Ideely</string>
+    <string name="package_name">nl.procontrolworks.ideely</string>
+    <string name="custom_url_scheme">nl.procontrolworks.ideely</string>
     <string name="widget_desc">Elke dag een kernidee op je beginscherm</string>
     <string name="widget_label">Idee van de dag</string>
 </resources>

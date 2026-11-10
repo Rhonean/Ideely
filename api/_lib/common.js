@@ -1,4 +1,4 @@
-// Gedeelde hulpfuncties voor de serverfuncties van Ideeënstash.
+// Gedeelde hulpfuncties voor de serverfuncties van Ideely.
 export const PER_HOUR = parseInt(process.env.RATE_PER_HOUR || "40", 10);
 export const PER_DAY = parseInt(process.env.RATE_PER_DAY || "600", 10);
 
@@ -47,7 +47,7 @@ export function model(tier) {
     : (process.env.MODEL_DEFAULT || "claude-sonnet-5-5");
 }
 
-const SYSTEM = "Je bent de schrijver van een leesapp zoals Deepstash. Volg het gevraagde antwoordformaat precies. Verzin nooit feiten, cijfers, citaten of namen.";
+const SYSTEM = "Je bent de schrijver van Ideely, een leesapp met korte kernideeën uit boeken. Volg het gevraagde antwoordformaat precies. Verzin nooit feiten, cijfers, citaten of namen.";
 
 // Start een gestreamd antwoord van Anthropic. Geeft {ok, status, error, message, reader}.
 export async function anthropicStream(prompt, { tier = "default", maxTokens = 2000 } = {}) {

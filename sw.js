@@ -1,5 +1,5 @@
-// Ideeënstash service worker: app werkt ook offline (behalve de AI-functies).
-const CACHE = "ideeenstash-v1";
+// Ideely service worker: app werkt ook offline (behalve de AI-functies).
+const CACHE = "ideely-v1";
 const CORE = ["/", "/index.html", "/manifest.webmanifest", "/icon.svg", "/icon-192.png", "/icon-512.png", "/icon-180.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

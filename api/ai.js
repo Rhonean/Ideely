@@ -1,4 +1,4 @@
-// Ideeënstash — algemene AI-functie (voorstellen, eigen boeken, geplakte artikelen).
+// Ideely —algemene AI-functie (voorstellen, eigen boeken, geplakte artikelen).
 import { cors, limited, sameOrigin, anthropicStream, pump, startText } from "./_lib/common.js";
 export const config = { maxDuration: 120 };
 const MAX_PROMPT = 80000;

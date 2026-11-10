@@ -1,4 +1,4 @@
-package nl.procontrolworks.ideeenstash;
+package nl.procontrolworks.ideely;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

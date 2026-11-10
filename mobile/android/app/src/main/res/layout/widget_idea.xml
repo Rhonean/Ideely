@@ -41,7 +41,7 @@
         android:textSize="13sp"
         android:lineSpacingMultiplier="1.15"
         android:textColor="#E6F7F5EF"
-        android:text="Open Ideeënstash om je eerste stash te lezen." />
+        android:text="Open Ideely om je eerste ideeën te lezen." />
 
     <TextView
         android:id="@+id/w_meta"

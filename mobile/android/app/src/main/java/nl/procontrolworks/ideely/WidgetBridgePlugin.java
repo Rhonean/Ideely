@@ -1,4 +1,4 @@
-package nl.procontrolworks.ideeenstash;
+package nl.procontrolworks.ideely;
 
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;

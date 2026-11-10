@@ -44,7 +44,7 @@ jobs:
       - name: Testversie beschikbaar maken
         uses: actions/upload-artifact@v4
         with:
-          name: ideeenstash-android-test
+          name: ideely-android-test
           path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
 
@@ -59,6 +59,6 @@ jobs:
           echo "run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> status.txt
           if [ -f "$GITHUB_WORKSPACE/build.log" ]; then tail -n 300 "$GITHUB_WORKSPACE/build.log" > build-tail.log; grep -n -i -E "error|failed|what went wrong" "$GITHUB_WORKSPACE/build.log" | head -n 80 > errors.txt || true; fi
           ls -la "$GITHUB_WORKSPACE/mobile/android/app/build/outputs/apk/debug/" > apk.txt 2>&1 || true
-          cp "$GITHUB_WORKSPACE/mobile/android/app/build/outputs/apk/debug/app-debug.apk" ideeenstash-test.apk 2>/dev/null || true
+          cp "$GITHUB_WORKSPACE/mobile/android/app/build/outputs/apk/debug/app-debug.apk" ideely-test.apk 2>/dev/null || true
           git add -A && git -c user.name=ci -c user.email=ci@localhost commit -q -m "Bouwverslag ${GITHUB_SHA}"
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" build-log
