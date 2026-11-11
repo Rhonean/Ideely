@@ -171,7 +171,11 @@ textarea{min-height:130px;resize:vertical}
 .slide .deep p{font-size:1.02rem}
 .slide .buy{margin:6px 0 14px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.stats div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.stats div,.stats button{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;text-align:left;color:var(--ink);font:inherit}
+.stats button span{color:var(--accent)}
+.backlink{border:0;background:none;color:var(--accent);font-weight:600;padding:10px 0 0;font-size:.92rem}
+.pageh{font-family:var(--f-display);font-size:1.6rem;margin:6px 0 4px}
+h2 .cnt{font-size:.8rem;color:var(--muted);font-weight:500}
 .stats b{display:block;font-family:var(--f-display);font-size:1.3rem;line-height:1.1}
 .stats span{font-size:.78rem;color:var(--muted)}
 .iotd{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;border:0;margin-top:14px;background:var(--tc);color:var(--card-ink);border-radius:20px;padding:18px;box-shadow:0 12px 28px -16px rgba(0,0,0,.45)}
@@ -372,14 +376,21 @@ const finished=b=>!b.live&&b.ideas.length>0&&prog(b)>=b.ideas.length;
 /* Profiel (doelen en onderwerpen) plus wat je echt leest: begonnen boeken tellen mee, uitgelezen boeken dubbel */
 function topicWeights(){const w={};for(const t of S.prof.topics||[])w[t]=(w[t]||0)+3;
   for(const g of S.prof.goals||[]){const G=GOALS.find(x=>x.id===g);if(G)G.topics.forEach((t,i)=>w[t]=(w[t]||0)+(i===0?2:1))}
-  for(const [id,n] of Object.entries(S.prof.progress||{})){if(!n)continue;const b=findBook(id);if(b&&b.topic)w[b.topic]=(w[b.topic]||0)+(finished(b)?2:1)}
+  for(const [id,n] of Object.entries(S.prof.progress||{})){if(!n)continue;const b=findBook(id);if(b&&b.topic)w[b.topic]=(w[b.topic]||0)+(finished(b)?1:0.5)}
   return w}
 function whyFor(b){const gs=(S.prof.goals||[]).map(g=>GOALS.find(x=>x.id===g)).filter(G=>G&&G.topics.includes(b.topic));
   if(gs.length)return T("Voor: ","For: ","Für: ")+gs[0].label.toLowerCase();
   if((S.prof.topics||[]).includes(b.topic))return T("Jij volgt ","You follow ","Du folgst ")+tn(b.topic);return ""}
 const dayRnd=id=>{let h=2166136261;for(const c of dayKey()+id)h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0)/4294967296};
-function recommended(limit){const w=topicWeights(),read=new Set(S.prof.read||[]);
-  return ALL.filter(b=>!read.has(b.id)&&prog(b)===0&&!b.unknown).map(b=>({b,w:w[b.topic]||0,s:(w[b.topic]||0)+(b.lazy?0:0.6)+dayRnd(b.id)*0.9})).filter(x=>x.w>0||!Object.keys(w).length).sort((a,c)=>c.s-a.s).slice(0,limit).map(x=>x.b)}
+/* Aanbevelingen gespreid over je onderwerpen: elk volgend boek uit hetzelfde onderwerp telt minder zwaar,
+   zodat één gelezen boek niet de hele rij naar zijn onderwerp trekt. */
+function recommended(limit){const w=topicWeights(),read=new Set(S.prof.read||[]),any=Object.keys(w).length;
+  const pool=ALL.filter(b=>!read.has(b.id)&&prog(b)===0&&!b.unknown&&(!any||w[b.topic])).map(b=>({b,s:(w[b.topic]||0)+(b.lazy?0:0.6)+dayRnd(b.id)*0.9}));
+  const out=[],per={};
+  while(out.length<limit&&pool.length){let bi=0,bs=-1e9;
+    for(let k=0;k<pool.length;k++){const x=pool[k],v=x.s-2.2*(per[x.b.topic]||0);if(v>bs){bs=v;bi=k}}
+    const x=pool.splice(bi,1)[0];per[x.b.topic]=(per[x.b.topic]||0)+1;out.push(x.b)}
+  return out}
 /* Het laatste boek waar je echt in las (minstens 3 ideeën) */
 function lastRead(){const t=S.prof.touched||{};
   return Object.keys(S.prof.progress||{}).filter(id=>(S.prof.progress[id]||0)>=3).map(findBook).filter(b=>b&&b.topic&&!b.kind).sort((a,b)=>(t[b.id]||0)-(t[a.id]||0))[0]||null}
@@ -416,11 +427,31 @@ function bookCard(b,opt={}){const n=b.ideas.length||8,p=prog(b);
     <span class="meter"><i style="width:${n?p/n*100:0}%"></i></span>
     <span class="count">${p>=n?T("Gelezen","Read","Gelesen"):p?p+" / "+nIdeas(n):nIdeas(n)+" · ± "+Math.max(2,Math.round(n*0.8))+" min"}</span></button>`}
 
+let sub=null;
+/* Overzicht van wat je gelezen hebt: uitgelezen, bezig, en eerder gelezen (uit je profiel) */
+function renderRead(){
+  const all=[...ALL,...S.books],t=S.prof.touched||{},byT=(a,b)=>(t[b.id]||0)-(t[a.id]||0);
+  const done=all.filter(finished).sort(byT);
+  const busy=all.filter(b=>{const p=prog(b);return p>0&&!finished(b)}).sort(byT);
+  const before=(S.prof.read||[]).map(findBook).filter(b=>b&&!finished(b));
+  const ideas=Object.values(S.prof.progress||{}).reduce((a,n)=>a+(n||0),0);
+  const shelf=(h,list)=>list.length?`<h2>${h} <span class="cnt">${list.length}</span></h2><div class="shelf">${list.map(b=>bookCard(b)).join("")}</div>`:"";
+  main.innerHTML=`<button class="backlink" id="rback">${T("← Voor jou","← For you","← Für dich")}</button>
+    <h1 class="pageh">${T("Wat je gelezen hebt","What you've read","Was du gelesen hast")}</h1>
+    <p class="lede">${(n=>T(`${nIdeas(ideas)} gelezen in ${n} ${n===1?"boek":"boeken"}.`,`${nIdeas(ideas)} read across ${n} ${n===1?"book":"books"}.`,`${nIdeas(ideas)} in ${n} ${n===1?"Buch":"Büchern"} gelesen.`))(done.length+busy.length)}</p>
+    ${shelf(T("Uitgelezen","Finished","Ausgelesen"),done)}
+    ${shelf(T("Bezig","In progress","Begonnen"),busy)}
+    ${shelf(T("Eerder gelezen","Read before","Früher gelesen"),before)}
+    ${!done.length&&!busy.length&&!before.length?`<div class="empty">${T("Je hebt nog geen boek gelezen. Begin met een aanbeveling op Voor jou.","You haven't read a book yet. Start with a recommendation on For you.","Du hast noch kein Buch gelesen. Beginne mit einer Empfehlung unter Für dich.")}</div>`:""}`;
+  document.getElementById("rback").onclick=()=>{sub=null;render();main.scrollTop=0};
+  bindOpen();
+}
 function render(){
   document.querySelectorAll("nav.tabs button").forEach(b=>{if(b.dataset.tab===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
   rollDay();
   document.getElementById("streak").textContent=S.prof.streak?streakTxt(S.prof.streak):"";
-  if(tab==="home")renderHome();else if(tab==="ontdek")renderDiscover();else renderSaved();
+  if(tab!=="home")sub=null;
+  if(tab==="home"&&sub==="read")renderRead();else if(tab==="home")renderHome();else if(tab==="ontdek")renderDiscover();else renderSaved();
 }
 function bindOpen(root=main){root.querySelectorAll("[data-open]").forEach(el=>el.onclick=()=>openReader(el.dataset.open))}
 
@@ -449,11 +480,11 @@ function renderHome(){
   /* bekende (handgeschreven) boeken buiten je onderwerpen, elke dag een andere selectie */
   const wider=CATALOG.filter(b=>!w[b.topic]&&!read.has(b.id)&&!shown.has(b.id)&&prog(b)===0&&!b.unknown).sort((a,b)=>dayRnd(a.id)-dayRnd(b.id)).slice(0,10);
   const mine=TOPICS.filter(t=>w[t]),other=TOPICS.filter(t=>!w[t]);
-  const stat=(n,l)=>`<div><b>${n}</b><span>${l}</span></div>`;
+  const stat=(n,l,go)=>go?`<button data-stat="${go}"><b>${n}</b><span>${l} ›</span></button>`:`<div><b>${n}</b><span>${l}</span></div>`;
   main.innerHTML=`
   <div class="today">${ring()}<div><b>${left?T(`Nog ${nIdeas(left)} voor vandaag`,`${nIdeas(left)} to go today`,`Noch ${nIdeas(left)} für heute`):T("Dagdoel gehaald","Daily goal reached","Tagesziel erreicht")}</b>
     <small>${busy.length?T("Ga verder waar je gebleven was.","Pick up where you left off.","Mach weiter, wo du aufgehört hast."):recs.length?T("Begin met een aanbeveling hieronder.","Start with a recommendation below.","Beginne mit einer Empfehlung unten."):T("Zoek een boek via Ontdek.","Find a book in Discover.","Finde ein Buch unter Entdecken.")}</small></div></div>
-  <div class="stats">${stat(S.prof.streak||0,T("dagen reeks","day streak","Tage Serie"))}${stat(done.length,T("boeken uit","books finished","Bücher fertig"))}${stat(S.saved.length,T("bewaard","saved","gespeichert"))}</div>
+  <div class="stats">${stat(S.prof.streak||0,T("dagen reeks","day streak","Tage Serie"))}${stat(done.length,T("boeken uit","books finished","Bücher fertig"),"read")}${stat(S.saved.length,T("bewaard","saved","gespeichert"),"saved")}</div>
   ${iod.id?`<button class="iotd" style="--tc:${topicColor(iod.topic)}" data-iod="${esc(iod.id)}|${iod.i}">
     <span class="kicker">${T("Idee van de dag","Idea of the day","Idee des Tages")} · ${esc(iod.book)}</span>
     <span class="t">${esc(iod.title)}</span>
@@ -470,6 +501,7 @@ function renderHome(){
   ${own.length?`<h2>${T("Zelf toegevoegd","Added by you","Selbst hinzugefügt")}</h2><div class="shelf">${own.map(b=>bookCard(b)).join("")}</div>`:""}
   ${done.length?`<h2>${T("Uitgelezen","Finished","Ausgelesen")}</h2><div class="shelf">${done.map(b=>bookCard(b)).join("")}</div>`:""}`;
   document.getElementById("edit").onclick=()=>openOnboarding(true);
+  main.querySelectorAll("[data-stat]").forEach(el=>el.onclick=()=>{if(el.dataset.stat==="saved")tab="bewaard";else sub="read";render();main.scrollTop=0});
   main.querySelectorAll("[data-iod]").forEach(el=>el.onclick=()=>{const[id,i]=el.dataset.iod.split("|");openReader(id,+i+1)});
   main.querySelectorAll("[data-topic]").forEach(el=>el.onclick=()=>{aiTopic=el.dataset.topic;tab="ontdek";render();main.scrollTop=0});
   schedulePrefetch([...busy,...recs,...wider.slice(0,2)]);
