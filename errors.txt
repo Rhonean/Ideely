@@ -1,0 +1,2 @@
+120:> Task :capacitor-local-notifications:checkKotlinGradlePluginConfigurationErrors SKIPPED
+125:> Task :revenuecat-purchases-capacitor:checkKotlinGradlePluginConfigurationErrors SKIPPED
