@@ -376,27 +376,38 @@ const finished=b=>!b.live&&b.ideas.length>0&&prog(b)>=b.ideas.length;
 /* Profiel (doelen en onderwerpen) plus wat je echt leest: begonnen boeken tellen mee, uitgelezen boeken dubbel */
 function topicWeights(){const w={};for(const t of S.prof.topics||[])w[t]=(w[t]||0)+3;
   for(const g of S.prof.goals||[]){const G=GOALS.find(x=>x.id===g);if(G)G.topics.forEach((t,i)=>w[t]=(w[t]||0)+(i===0?2:1))}
-  for(const [id,n] of Object.entries(S.prof.progress||{})){if(!n)continue;const b=findBook(id);if(b&&b.topic)w[b.topic]=(w[b.topic]||0)+(finished(b)?1:0.5)}
+  /* wat je leest telt mee, maar per onderwerp hooguit 1,5 punt: zo trekt veel lezen in één onderwerp niet alles naar zich toe */
+  const h={};for(const [id,n] of Object.entries(S.prof.progress||{})){if(!n)continue;const b=findBook(id);if(b&&b.topic)h[b.topic]=(h[b.topic]||0)+(finished(b)?1:0.5)}
+  for(const t in h)w[t]=(w[t]||0)+Math.min(1.5,h[t]);
   return w}
+/* Verwante onderwerpen, voor "Omdat je … las" */
+const RELATED={Ondernemen:["Leiderschap","Economie","Productiviteit"],Leiderschap:["Communicatie","Ondernemen","Psychologie"],Productiviteit:["Gewoontes","Energie","Mindset"],Psychologie:["Relaties","Mindset","Communicatie"],Geld:["Economie","Ondernemen","Mindset"],Gezondheid:["Energie","Gewoontes","Wetenschap"],Energie:["Gezondheid","Productiviteit","Gewoontes"],Mindset:["Filosofie","Psychologie","Gewoontes"],Relaties:["Psychologie","Communicatie","Filosofie"],Filosofie:["Mindset","Geschiedenis","Psychologie"],Communicatie:["Leiderschap","Relaties","Psychologie"],Gewoontes:["Productiviteit","Gezondheid","Mindset"],Wetenschap:["Natuur","Technologie","Geschiedenis"],Natuur:["Wetenschap","Geschiedenis","Gezondheid"],Geschiedenis:["Politiek","Economie","Filosofie"],Politiek:["Geschiedenis","Economie","Filosofie"],Economie:["Geld","Politiek","Geschiedenis"],Technologie:["Wetenschap","Economie","Ondernemen"]};
+/* Om de beurt één boek per onderwerp, zwaarste onderwerp eerst */
+function roundRobin(topics,lists,limit){const out=[];
+  while(out.length<limit){let added=false;for(const t of topics){const L=lists[t];if(L&&L.length&&out.length<limit){out.push(L.shift());added=true}}if(!added)break}
+  return out}
 function whyFor(b){const gs=(S.prof.goals||[]).map(g=>GOALS.find(x=>x.id===g)).filter(G=>G&&G.topics.includes(b.topic));
   if(gs.length)return T("Voor: ","For: ","Für: ")+gs[0].label.toLowerCase();
   if((S.prof.topics||[]).includes(b.topic))return T("Jij volgt ","You follow ","Du folgst ")+tn(b.topic);return ""}
 const dayRnd=id=>{let h=2166136261;for(const c of dayKey()+id)h=Math.imul(h^c.charCodeAt(0),16777619);return (h>>>0)/4294967296};
-/* Aanbevelingen gespreid over je onderwerpen: elk volgend boek uit hetzelfde onderwerp telt minder zwaar,
-   zodat één gelezen boek niet de hele rij naar zijn onderwerp trekt. */
-function recommended(limit){const w=topicWeights(),read=new Set(S.prof.read||[]),any=Object.keys(w).length;
-  const pool=ALL.filter(b=>!read.has(b.id)&&prog(b)===0&&!b.unknown&&(!any||w[b.topic])).map(b=>({b,s:(w[b.topic]||0)+(b.lazy?0:0.6)+dayRnd(b.id)*0.9}));
-  const out=[],per={};
-  while(out.length<limit&&pool.length){let bi=0,bs=-1e9;
-    for(let k=0;k<pool.length;k++){const x=pool[k],v=x.s-2.2*(per[x.b.topic]||0);if(v>bs){bs=v;bi=k}}
-    const x=pool.splice(bi,1)[0];per[x.b.topic]=(per[x.b.topic]||0)+1;out.push(x.b)}
-  return out}
+/* Aanbevelingen: om de beurt een boek uit elk van je onderwerpen, zodat één onderwerp de rij niet overneemt */
+const fresh=(b,read)=>!read.has(b.id)&&prog(b)===0&&!b.unknown;
+const pickScore=b=>(b.lazy?0:0.6)+dayRnd(b.id)*0.9;
+function recommended(limit){const w=topicWeights(),read=new Set(S.prof.read||[]);
+  const topics=Object.keys(w).filter(t=>w[t]>0).sort((a,b)=>w[b]-w[a]);
+  if(!topics.length)return ALL.filter(b=>fresh(b,read)).sort((a,b)=>pickScore(b)-pickScore(a)).slice(0,limit);
+  const lists={};for(const b of ALL)if(w[b.topic]&&fresh(b,read))(lists[b.topic]||(lists[b.topic]=[])).push(b);
+  for(const t in lists)lists[t].sort((a,b)=>pickScore(b)-pickScore(a));
+  return roundRobin(topics,lists,limit)}
 /* Het laatste boek waar je echt in las (minstens 3 ideeën) */
 function lastRead(){const t=S.prof.touched||{};
   return Object.keys(S.prof.progress||{}).filter(id=>(S.prof.progress[id]||0)>=3).map(findBook).filter(b=>b&&b.topic&&!b.kind).sort((a,b)=>(t[b.id]||0)-(t[a.id]||0))[0]||null}
-/* "Omdat je X las": ongelezen boeken uit hetzelfde onderwerp */
-function becauseRead(limit,skip=[]){const from=lastRead();if(!from)return null;const read=new Set([...(S.prof.read||[]),...skip]);
-  const books=ALL.filter(b=>b.topic===from.topic&&b.id!==from.id&&!read.has(b.id)&&prog(b)===0&&!b.unknown).sort((a,b)=>dayRnd(a.id)-dayRnd(b.id)).slice(0,limit);
+/* "Omdat je X las": twee boeken uit hetzelfde onderwerp, de rest uit verwante onderwerpen */
+function becauseRead(limit,skip=[]){const from=lastRead();if(!from)return null;const read=new Set([...(S.prof.read||[]),...skip,from.id]);
+  const topics=[from.topic,...(RELATED[from.topic]||[])],lists={};
+  for(const t of topics)lists[t]=ALL.filter(b=>b.topic===t&&fresh(b,read)).sort((a,b)=>dayRnd(a.id)-dayRnd(b.id));
+  const same=lists[from.topic].splice(0,2);
+  const books=[...same,...roundRobin(topics.slice(1),lists,limit-same.length)].slice(0,limit);
   return books.length?{from,books}:null}
 
 /* ---------- dagdoel en reeks ---------- */
@@ -917,6 +928,9 @@ function bindReader(){
   R.querySelectorAll("[data-deep]").forEach(btn=>{if(btn.dataset.bound)return;btn.dataset.bound=1;btn.onclick=()=>toggleDeep(b,+btn.dataset.deep,btn)});
 }
 let deepBusy=null;
+/* Een tekst die bij de limiet is afgebroken eindigt op de laatste volledige zin */
+const cutToSentence=t=>{const m=[...String(t).matchAll(/[.!?…]["”’)]?(?=\s|$)/g)].pop();return m?t.slice(0,m.index+m[0].length).trim():String(t).trim()};
+const endsWell=t=>/[.!?…]["”’)]?\s*$/.test(String(t));
 function renderDeep(box,text,note){box.innerHTML=`<div class="dk">${L_DEEP}</div>${String(text).split(/\n\s*\n|\n/).filter(p=>p.trim()).map(p=>`<p>${esc(p)}</p>`).join("")}${note?`<small>${esc(note)}</small>`:""}`}
 function deepPrompt(b,it){
   const src=b.kind==="tekst"?`een artikel${b.title?` ("${b.title}")`:""}${b.source?` van ${b.source}`:""}`:`het boek "${b.title}" van ${b.author||"onbekende auteur"}${b.year?` (${b.year})`:""}`;
@@ -925,7 +939,7 @@ function deepPrompt(b,it){
 Titel: ${it.title}
 Tekst: ${it.body}
 
-Schrijf in ${LANG_IN} een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
+Schrijf in ${LANG_IN} een verdieping van 200 tot 300 woorden (nooit meer dan 300), in 3 of 4 korte alinea's:
 - Leg de redenering of het mechanisme achter het idee uit zoals de auteur het onderbouwt. Herhaal de kaart niet.
 - Noem een voorbeeld, onderzoek of anekdote uit de bron alleen als je zeker weet dat die er echt in staat. Verzin geen cijfers, namen of citaten; twijfel je, laat het dan weg.
 - Geef een kanttekening of beperking als die relevant is, bijvoorbeeld kritiek op het idee.
@@ -936,7 +950,7 @@ async function toggleDeep(b,i,btn){
   const box=document.getElementById("deep-"+i),lab=btn.querySelector("span"),sid=SK(b.id)+"_"+i;
   if(!box.hidden){box.hidden=true;btn.setAttribute("aria-expanded","false");lab.textContent=L_SHOWDEEP;return}
   box.hidden=false;btn.setAttribute("aria-expanded","true");lab.textContent=T("Verberg verdieping","Hide deep dive","Vertiefung ausblenden");
-  if(S.deep[sid]){renderDeep(box,S.deep[sid]);return}
+  if(S.deep[sid]&&endsWell(S.deep[sid])){renderDeep(box,S.deep[sid]);return}
   if(b.live){box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${L_WAIT}.</p>`;return}
   if(deepBusy){box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${T("Er wordt al een andere verdieping geschreven. Probeer het zo opnieuw.","Another deep dive is being written. Try again in a moment.","Gerade wird eine andere Vertiefung geschrieben. Versuch es gleich noch einmal.")}</p>`;return}
   box.innerHTML=`<div class="dk">${L_DEEP}</div><p><span class="spin"></span>${T("Bezig met schrijven…","Writing…","Wird geschrieben…")}</p>`;
@@ -944,10 +958,11 @@ async function toggleDeep(b,i,btn){
   try{
     const shared=b.catalog||b.lazy;
     const r=shared?await streamGet(`${API}/api/deep?id=${encodeURIComponent(b.id)}&i=${i}${LQ}`,text=>{if(box.isConnected)renderDeep(box,text)})
-      :await SAMPLE_FN(deepPrompt(b,b.ideas[i]),{modelTier:"default",maxTokens:1500,onText:({text})=>{if(!box.isConnected)return;renderDeep(box,text)}});
+      :await SAMPLE_FN(deepPrompt(b,b.ideas[i]),{modelTier:"default",maxTokens:4000,onText:({text})=>{if(!box.isConnected)return;renderDeep(box,text)}});
     if(r.json)throw aiErr("upstream_error","");
-    if(box.isConnected)renderDeep(box,r.text,r.truncated?T("De verdieping is ingekort.","The deep dive was shortened.","Die Vertiefung wurde gekürzt."):"");
-    putDeep(sid,r.text).catch(()=>{});
+    const txt=r.truncated?cutToSentence(r.text):r.text;
+    if(box.isConnected)renderDeep(box,txt);
+    putDeep(sid,txt).catch(()=>{});
   }catch(e){if(box.isConnected){if(e?.text)renderDeep(box,e.text,T("Onderbroken: ","Interrupted: ","Unterbrochen: ")+errMsg(e));else box.innerHTML=`<div class="dk">${L_DEEP}</div><p>${esc(errMsg(e))}</p>`}}
   finally{deepBusy=null}
 }

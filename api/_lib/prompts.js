@@ -31,7 +31,7 @@ export function deepPrompt(b, it, lang = "nl") {
 Titel: ${it.title}
 Tekst: ${it.body}
 
-Schrijf in ${LANGS[lang]} een verdieping van 200 tot 300 woorden, in 3 of 4 korte alinea's:
+Schrijf in ${LANGS[lang]} een verdieping van 200 tot 300 woorden (nooit meer dan 300), in 3 of 4 korte alinea's:
 - Leg de redenering of het mechanisme achter het idee uit zoals de auteur het onderbouwt. Herhaal de kaart niet.
 - Noem een voorbeeld, onderzoek of anekdote uit het boek alleen als je zeker weet dat die er echt in staat. Verzin geen cijfers, namen of citaten; twijfel je, laat het dan weg.
 - Geef een kanttekening of beperking als die relevant is, bijvoorbeeld kritiek op het idee.
